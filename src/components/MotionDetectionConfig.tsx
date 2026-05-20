@@ -1,38 +1,62 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 
-type Props = {
-  cameraIndex: number
-  motionOn: boolean
-  onMotionOnChange: (on: boolean) => void
-  onBack: () => void
-  onClose: () => void
-}
+export type Point = { x: number; y: number }
 
-type Point = { x: number; y: number }
+export type MotionConfig = {
+  on: boolean
+  sensitivity: number // 0..4
+  hasPicture: boolean
+  corners: [Point, Point, Point, Point]
+}
 
 const PHOTO_W = 432
 const PHOTO_H = 250
 const CTRL = 32 // control-point diameter
 const COUNTDOWN_SECONDS = 5
 
-const defaultCorners = (): [Point, Point, Point, Point] => [
+export const defaultCorners = (): [Point, Point, Point, Point] => [
   { x: 19, y: 19 },
   { x: PHOTO_W - 19, y: 19 },
   { x: PHOTO_W - 19, y: PHOTO_H - 19 },
   { x: 19, y: PHOTO_H - 19 },
 ]
 
+export const defaultMotionConfig = (): MotionConfig => ({
+  on: true,
+  sensitivity: 2,
+  hasPicture: false,
+  corners: defaultCorners(),
+})
+
+type Props = {
+  cameraIndex: number
+  motion: MotionConfig
+  onSave: (next: MotionConfig) => void
+  onBack: () => void
+  onClose: () => void
+}
+
+const cornersEqual = (a: readonly Point[], b: readonly Point[]) =>
+  a.length === b.length && a.every((p, i) => p.x === b[i].x && p.y === b[i].y)
+
 export function MotionDetectionConfig({
   cameraIndex,
-  motionOn,
-  onMotionOnChange,
+  motion,
+  onSave,
   onBack,
   onClose,
 }: Props) {
-  const [phase, setPhase] = useState<'idle' | 'countdown' | 'taken'>('idle')
+  // Local draft state — initialized from the committed motion config.
+  const [on, setOn] = useState(motion.on)
+  const [sensitivity, setSensitivity] = useState(motion.sensitivity)
+  const [hasPicture, setHasPicture] = useState(motion.hasPicture)
+  const [corners, setCorners] = useState<[Point, Point, Point, Point]>(motion.corners)
+
+  const [phase, setPhase] = useState<'idle' | 'countdown' | 'taken'>(
+    motion.hasPicture ? 'taken' : 'idle'
+  )
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
-  const [corners, setCorners] = useState<[Point, Point, Point, Point]>(defaultCorners)
 
   useEffect(() => {
     if (phase !== 'countdown') return
@@ -43,6 +67,7 @@ export function MotionDetectionConfig({
       if (n <= 0) {
         window.clearInterval(id)
         setPhase('taken')
+        setHasPicture(true)
         setCorners(defaultCorners())
       } else {
         setCountdown(n)
@@ -51,7 +76,16 @@ export function MotionDetectionConfig({
     return () => window.clearInterval(id)
   }, [phase])
 
-  const dirty = phase === 'taken'
+  const dirty =
+    on !== motion.on ||
+    sensitivity !== motion.sensitivity ||
+    hasPicture !== motion.hasPicture ||
+    !cornersEqual(corners, motion.corners)
+
+  const save = () => {
+    if (!dirty) return
+    onSave({ on, sensitivity, hasPicture, corners })
+  }
 
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
@@ -89,13 +123,14 @@ export function MotionDetectionConfig({
           </button>
         </div>
 
-        <MotionToggleRow
-          cameraIndex={cameraIndex}
-          on={motionOn}
-          onChange={onMotionOnChange}
-        />
+        <MotionToggleRow cameraIndex={cameraIndex} on={on} onChange={setOn} />
 
-        <PhotoArea phase={phase} countdown={countdown} corners={corners} setCorners={setCorners} />
+        <PhotoArea
+          phase={phase}
+          countdown={countdown}
+          corners={corners}
+          setCorners={setCorners}
+        />
 
         <div className="flex gap-[10px]">
           <ActionButton
@@ -113,11 +148,11 @@ export function MotionDetectionConfig({
           </ActionButton>
         </div>
 
-        <SensitivityPanel />
+        <SensitivityPanel value={sensitivity} onChange={setSensitivity} />
 
         <div className="flex-1" />
 
-        <SaveButton enabled={dirty} onClick={onBack} />
+        <SaveButton enabled={dirty} onClick={save} />
       </div>
     </div>
   )
@@ -330,12 +365,17 @@ function ActionButton({
   )
 }
 
-function SensitivityPanel() {
-  const [level, setLevel] = useState(2) // 0..4 -> Low..High; Medium = 2
+function SensitivityPanel({
+  value,
+  onChange,
+}: {
+  value: number
+  onChange: (v: number) => void
+}) {
   const labels = ['Lowest', 'Low', 'Medium', 'High', 'Highest']
-  const dec = () => setLevel((l) => Math.max(0, l - 1))
-  const inc = () => setLevel((l) => Math.min(4, l + 1))
-  const fillPct = ((level + 1) / 5) * 100
+  const dec = () => onChange(Math.max(0, value - 1))
+  const inc = () => onChange(Math.min(4, value + 1))
+  const fillPct = ((value + 1) / 5) * 100
 
   return (
     <div className="w-full rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg p-px">
@@ -345,7 +385,7 @@ function SensitivityPanel() {
           Sensitivity
         </span>
         <span className="font-inter font-bold text-btn-secondary-label text-[20px] leading-none tracking-[0.0066em] whitespace-nowrap">
-          {labels[level]}
+          {labels[value]}
         </span>
       </div>
       <div className="flex items-stretch gap-0 px-[8px] py-[8px]">
