@@ -243,7 +243,7 @@ function PictureWithControlPoints({
   return (
     <div ref={containerRef} className="absolute inset-0">
       <img
-        src="/warehouse.png"
+        src={`${import.meta.env.BASE_URL}warehouse.png`}
         alt="Camera view"
         className="absolute inset-0 h-full w-full object-cover"
         draggable={false}
