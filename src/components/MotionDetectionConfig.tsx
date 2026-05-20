@@ -32,6 +32,7 @@ export const defaultMotionConfig = (): MotionConfig => ({
 type Props = {
   cameraIndex: number
   motion: MotionConfig
+  cameraConnected: boolean
   onSave: (next: MotionConfig) => void
   onBack: () => void
   onClose: () => void
@@ -43,6 +44,7 @@ const cornersEqual = (a: readonly Point[], b: readonly Point[]) =>
 export function MotionDetectionConfig({
   cameraIndex,
   motion,
+  cameraConnected,
   onSave,
   onBack,
   onClose,
@@ -57,6 +59,13 @@ export function MotionDetectionConfig({
     motion.hasPicture ? 'taken' : 'idle'
   )
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
+
+  // Cancel any in-progress countdown if the camera disconnects mid-flow.
+  useEffect(() => {
+    if (!cameraConnected && phase === 'countdown') {
+      setPhase(motion.hasPicture ? 'taken' : 'idle')
+    }
+  }, [cameraConnected, phase, motion.hasPicture])
 
   useEffect(() => {
     if (phase !== 'countdown') return
@@ -104,7 +113,8 @@ export function MotionDetectionConfig({
             type="button"
             aria-label="Back to Camera Settings"
             onClick={onBack}
-            className="shrink-0 text-brand-primary"
+            disabled={!cameraConnected}
+            className={`shrink-0 ${cameraConnected ? 'text-brand-primary' : 'text-[#a6a6a6] cursor-not-allowed'}`}
             style={{ width: 36, height: 36 }}
           >
             <BackArrowIcon className="h-full w-full" />
@@ -123,36 +133,44 @@ export function MotionDetectionConfig({
           </button>
         </div>
 
-        <MotionToggleRow cameraIndex={cameraIndex} on={on} onChange={setOn} />
+        <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
+          <MotionToggleRow cameraIndex={cameraIndex} on={on} onChange={setOn} />
+        </div>
 
-        <PhotoArea
-          phase={phase}
-          countdown={countdown}
-          corners={corners}
-          setCorners={setCorners}
-        />
+        {cameraConnected ? (
+          <PhotoArea
+            phase={phase}
+            countdown={countdown}
+            corners={corners}
+            setCorners={setCorners}
+          />
+        ) : (
+          <DisconnectedPanel />
+        )}
 
         <div className="flex gap-[10px]">
           <ActionButton
             primary
-            disabled={phase === 'countdown'}
+            disabled={!cameraConnected || phase === 'countdown'}
             onClick={() => setPhase('countdown')}
           >
             Take Picture
           </ActionButton>
           <ActionButton
-            disabled={phase !== 'taken'}
+            disabled={!cameraConnected || phase !== 'taken'}
             onClick={() => setCorners(defaultCorners())}
           >
             Back to Default
           </ActionButton>
         </div>
 
-        <SensitivityPanel value={sensitivity} onChange={setSensitivity} />
+        <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
+          <SensitivityPanel value={sensitivity} onChange={setSensitivity} />
+        </div>
 
         <div className="flex-1" />
 
-        <SaveButton enabled={dirty} onClick={save} />
+        <SaveButton enabled={cameraConnected && dirty} onClick={save} />
       </div>
     </div>
   )
@@ -195,6 +213,29 @@ function MotionToggleRow({
         >
           ON
         </button>
+      </div>
+    </div>
+  )
+}
+
+function DisconnectedPanel() {
+  return (
+    <div
+      className="relative shrink-0 flex items-center justify-center rounded-[6px] border"
+      style={{
+        width: PHOTO_W,
+        height: PHOTO_H,
+        background: '#f7dbd2',
+        borderColor: '#f7b6a1',
+      }}
+    >
+      <div className="text-center px-[24px]" style={{ color: '#732006' }}>
+        <p className="font-inter font-bold text-[32px] leading-none mb-[14px] tracking-[0.0066em]">
+          Camera Disconnected
+        </p>
+        <p className="font-inter font-medium text-[24px] leading-[1.2] tracking-[0.0066em]">
+          Check camera connection
+        </p>
       </div>
     </div>
   )

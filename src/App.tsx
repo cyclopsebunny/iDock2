@@ -118,6 +118,7 @@ export default function App() {
             <MotionDetectionConfig
               cameraIndex={selectedCamera}
               motion={motionConfig[selectedCamera - 1]}
+              cameraConnected={cameras[selectedCamera - 1] === 'connected'}
               onSave={(next) => {
                 setMotionConfigFor(selectedCamera - 1, next)
                 setMenu('camera-settings')
