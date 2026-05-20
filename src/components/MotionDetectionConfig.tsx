@@ -3,6 +3,8 @@ import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 
 type Props = {
   cameraIndex: number
+  motionOn: boolean
+  onMotionOnChange: (on: boolean) => void
   onBack: () => void
   onClose: () => void
 }
@@ -21,8 +23,13 @@ const defaultCorners = (): [Point, Point, Point, Point] => [
   { x: 19, y: PHOTO_H - 19 },
 ]
 
-export function MotionDetectionConfig({ cameraIndex, onBack, onClose }: Props) {
-  const [motionOn, setMotionOn] = useState(true)
+export function MotionDetectionConfig({
+  cameraIndex,
+  motionOn,
+  onMotionOnChange,
+  onBack,
+  onClose,
+}: Props) {
   const [phase, setPhase] = useState<'idle' | 'countdown' | 'taken'>('idle')
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
   const [corners, setCorners] = useState<[Point, Point, Point, Point]>(defaultCorners)
@@ -85,7 +92,7 @@ export function MotionDetectionConfig({ cameraIndex, onBack, onClose }: Props) {
         <MotionToggleRow
           cameraIndex={cameraIndex}
           on={motionOn}
-          onChange={setMotionOn}
+          onChange={onMotionOnChange}
         />
 
         <PhotoArea phase={phase} countdown={countdown} corners={corners} setCorners={setCorners} />

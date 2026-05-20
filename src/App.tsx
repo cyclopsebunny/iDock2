@@ -27,6 +27,7 @@ export default function App() {
   const [menu, setMenu] = useState<Menu>('none')
   const [cameras, setCameras] = useState<CameraState[]>(['connected', 'never'])
   const [cameraEnabled, setCameraEnabled] = useState<boolean[]>([true, true])
+  const [motionDetectionOn, setMotionDetectionOn] = useState<boolean[]>([true, true])
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -35,6 +36,9 @@ export default function App() {
   }
   const setCameraEnabledFor = (idx: number, enabled: boolean) => {
     setCameraEnabled((prev) => prev.map((c, i) => (i === idx ? enabled : c)))
+  }
+  const setMotionDetectionOnFor = (idx: number, on: boolean) => {
+    setMotionDetectionOn((prev) => prev.map((c, i) => (i === idx ? on : c)))
   }
 
   return (
@@ -96,7 +100,7 @@ export default function App() {
             <CameraSettings
               cameraIndex={selectedCamera}
               cameraEnabled={cameraEnabled[selectedCamera - 1]}
-              motionDetectionOn={true}
+              motionDetectionOn={motionDetectionOn[selectedCamera - 1]}
               onBack={() => setMenu('cameras')}
               onClose={() => setMenu('none')}
               onOpenCameraState={() => setMenu('camera-state')}
@@ -106,6 +110,8 @@ export default function App() {
           {menu === 'motion-detection' && mode === 'unlocked' && (
             <MotionDetectionConfig
               cameraIndex={selectedCamera}
+              motionOn={motionDetectionOn[selectedCamera - 1]}
+              onMotionOnChange={(on) => setMotionDetectionOnFor(selectedCamera - 1, on)}
               onBack={() => setMenu('camera-settings')}
               onClose={() => setMenu('none')}
             />
