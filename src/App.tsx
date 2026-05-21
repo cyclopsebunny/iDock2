@@ -108,6 +108,7 @@ export default function App() {
               cameraIndex={selectedCamera}
               cameraEnabled={cameraEnabled[selectedCamera - 1]}
               motionDetectionOn={motionConfig[selectedCamera - 1].on}
+              cameraConnected={cameras[selectedCamera - 1] === 'connected'}
               onBack={() => setMenu('cameras')}
               onClose={() => setMenu('none')}
               onOpenCameraState={() => setMenu('camera-state')}
