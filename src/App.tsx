@@ -28,6 +28,7 @@ import {
 } from './components/MotionDetectionConfig'
 import { DeviceFrame } from './components/DeviceFrame'
 import { Counters } from './components/Counters'
+import { Diagnostics } from './components/Diagnostics'
 import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
 import {
@@ -75,6 +76,7 @@ type Menu =
   | 'network-password'
   | 'network-connecting'
   | 'update-firmware'
+  | 'diagnostics'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -371,6 +373,13 @@ export default function App() {
               onBack={() => setMenu('settings')}
               onClose={() => setMenu('none')}
               onOpenCameras={() => setMenu('cameras')}
+              onOpenDiagnostics={() => setMenu('diagnostics')}
+            />
+          )}
+          {menu === 'diagnostics' && mode === 'unlocked' && (
+            <Diagnostics
+              onBack={() => setMenu('idock-config')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'cameras' && mode === 'unlocked' && (

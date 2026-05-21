@@ -6,9 +6,15 @@ type Props = {
   onBack: () => void
   onClose: () => void
   onOpenCameras: () => void
+  onOpenDiagnostics: () => void
 }
 
-export function IDockConfigMenu({ onBack, onClose, onOpenCameras }: Props) {
+export function IDockConfigMenu({
+  onBack,
+  onClose,
+  onOpenCameras,
+  onOpenDiagnostics,
+}: Props) {
   const t = useT()
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
@@ -45,7 +51,7 @@ export function IDockConfigMenu({ onBack, onClose, onOpenCameras }: Props) {
             <CloseIcon className="h-full w-full" />
           </button>
         </div>
-        <MenuRow label={t('Diagnostics')} />
+        <MenuRow label={t('Diagnostics')} onClick={onOpenDiagnostics} />
         <MenuRow label={t('Maxum Settings')} />
         <MenuRow label={t('Field Installation Settings')} />
         <MenuRow label={t('Factory Installation Settings')} />

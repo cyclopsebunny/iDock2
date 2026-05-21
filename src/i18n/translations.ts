@@ -182,6 +182,17 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'USB Not Found': 'USB no encontrado',
     'Connect a USB to update the firmware':
       'Conecte un USB para actualizar el firmware',
+
+    'Controller Info': 'Información del controlador',
+    'Next Preventative Maintenance': 'Próximo mantenimiento preventivo',
+    'Max Days to PM': 'Días máx. hasta el PM',
+    'Controller I/O': 'E/S del controlador',
+    'E-Stop': 'Parada de emergencia',
+    'E-Guide Lights': 'Luces E-Guide',
+    'Edge Lights': 'Luces de borde',
+    'Below End Load': 'Carga bajo el extremo',
+    'Auto Raise': 'Elevación auto',
+    'Self Contained': 'Autocontenido',
   },
   fr: {
     Locked: 'Verrouillé',
@@ -351,6 +362,17 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'USB Not Found': 'USB introuvable',
     'Connect a USB to update the firmware':
       'Connectez une clé USB pour mettre à jour le micrologiciel',
+
+    'Controller Info': 'Infos du contrôleur',
+    'Next Preventative Maintenance': 'Prochaine maintenance préventive',
+    'Max Days to PM': 'Jours max avant PM',
+    'Controller I/O': 'E/S du contrôleur',
+    'E-Stop': "Arrêt d'urgence",
+    'E-Guide Lights': 'Voyants E-Guide',
+    'Edge Lights': 'Voyants de bord',
+    'Below End Load': 'Charge sous extrémité',
+    'Auto Raise': 'Levée auto',
+    'Self Contained': 'Autonome',
   },
 }
 
