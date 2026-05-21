@@ -20,6 +20,7 @@ import {
   NetworkPassword,
 } from './components/NetworkFlow'
 import { TIMER_KEYS, TimerDetail, TimerKey, Timers } from './components/Timers'
+import { UpdateFirmware } from './components/UpdateFirmware'
 import {
   defaultMotionConfig,
   MotionConfig,
@@ -73,6 +74,7 @@ type Menu =
   | 'network-other'
   | 'network-password'
   | 'network-connecting'
+  | 'update-firmware'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -239,6 +241,13 @@ export default function App() {
               onOpenDateTime={() => setMenu('datetime')}
               onOpenTimers={() => setMenu('timers')}
               onOpenNetwork={() => setMenu('network')}
+              onOpenUpdateFirmware={() => setMenu('update-firmware')}
+            />
+          )}
+          {menu === 'update-firmware' && mode === 'unlocked' && (
+            <UpdateFirmware
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'network' && mode === 'unlocked' && (

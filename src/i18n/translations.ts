@@ -178,6 +178,10 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'IP Address': 'Dirección IP',
     'Ping Gateway': 'Ping al gateway',
     'Physical Gateway': 'Gateway físico',
+
+    'USB Not Found': 'USB no encontrado',
+    'Connect a USB to update the firmware':
+      'Conecte un USB para actualizar el firmware',
   },
   fr: {
     Locked: 'Verrouillé',
@@ -343,6 +347,10 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'IP Address': 'Adresse IP',
     'Ping Gateway': 'Ping passerelle',
     'Physical Gateway': 'Passerelle physique',
+
+    'USB Not Found': 'USB introuvable',
+    'Connect a USB to update the firmware':
+      'Connectez une clé USB pour mettre à jour le micrologiciel',
   },
 }
 
