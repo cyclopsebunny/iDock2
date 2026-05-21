@@ -387,18 +387,26 @@ function ConnectionGraphic({
   animateLeft: boolean
   animateRight: boolean
 }) {
-  // The Figma frame is 128px tall and items are top-aligned within it; the
-  // controller is 80px tall, the router 60px, the cloud ~32px, and the
-  // connectors only 24px. Aligning to the bottom of the row puts the router
-  // body, controller bottom, cloud body, and the dot/line connector all on
-  // the same horizontal line — matching the Figma layout.
+  // Figma layout (Frame 484858 → 484859):
+  //   Controller is 80 tall, top-aligned. Router is 60 tall, top-aligned.
+  //   Connectors and Cloud bottom-align with the router (60 tall logical row),
+  //   while the controller extends ~20px BELOW the router/cloud baseline.
+  //
+  // We model this by aligning everything to the bottom of an 80-tall row and
+  // lifting the non-controller items up by 20px so their bottoms land on the
+  // router's body baseline, leaving the controller alone to sit on the row
+  // bottom.
   return (
-    <div className="flex items-end gap-[8px] px-[16px] pt-[16px] pb-[12px] h-[112px]">
+    <div className="flex items-end gap-[8px] px-[16px] pt-[16px] pb-[12px] h-[108px]">
       <ConnectingControllerIcon className="shrink-0" />
       <Connector dotted={animateLeft} />
-      {routerActive ? <RouterActiveIcon className="shrink-0" /> : <RouterIdleIcon className="shrink-0" />}
+      <span className="shrink-0" style={{ marginBottom: 20 }}>
+        {routerActive ? <RouterActiveIcon /> : <RouterIdleIcon />}
+      </span>
       <Connector dotted={animateRight} />
-      {cloudActive ? <CloudActiveIcon className="shrink-0" /> : <CloudIdleIcon className="shrink-0" />}
+      <span className="shrink-0" style={{ marginBottom: 20 }}>
+        {cloudActive ? <CloudActiveIcon /> : <CloudIdleIcon />}
+      </span>
     </div>
   )
 }
@@ -407,7 +415,7 @@ function Connector({ dotted }: { dotted: boolean }) {
   return (
     <div
       className="flex-1 flex justify-center"
-      style={{ alignItems: 'center', paddingBottom: 18 }}
+      style={{ alignItems: 'center', marginBottom: 20 }}
     >
       {dotted ? (
         <ConnectingDotsIcon className="w-full max-w-[56px]" />
