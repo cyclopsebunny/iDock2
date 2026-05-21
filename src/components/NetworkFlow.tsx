@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
 import {
   CheckCircleIcon,
-  CloudIcon,
+  CloudActiveIcon,
+  CloudIdleIcon,
+  ConnectingControllerIcon,
+  ConnectingDotsIcon,
+  ConnectingLineIcon,
   EyeIcon,
-  PhoneIcon,
-  RouterIcon,
+  RouterActiveIcon,
+  RouterIdleIcon,
 } from '../icons/NetworkFlowIcons'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 import { Wifi2Icon, Wifi3Icon, WifiFullIcon } from '../icons/WifiSignalIcons'
@@ -384,38 +388,24 @@ function ConnectionGraphic({
   animateRight: boolean
 }) {
   return (
-    <div className="flex items-center justify-between px-[8px] py-[12px]">
-      <PhoneIcon />
-      <Connector active={!animateLeft} dotted={animateLeft} />
-      <RouterIcon state={routerActive ? 'active' : 'idle'} />
-      <Connector active={cloudActive && !animateRight} dotted={animateRight} />
-      <CloudIcon state={cloudActive ? 'active' : 'idle'} />
+    <div className="flex items-center gap-[8px] px-[16px] pt-[8px] pb-[12px] h-[96px]">
+      <ConnectingControllerIcon className="shrink-0" />
+      <Connector dotted={animateLeft} />
+      {routerActive ? <RouterActiveIcon className="shrink-0" /> : <RouterIdleIcon className="shrink-0" />}
+      <Connector dotted={animateRight} />
+      {cloudActive ? <CloudActiveIcon className="shrink-0" /> : <CloudIdleIcon className="shrink-0" />}
     </div>
   )
 }
 
-function Connector({ active, dotted }: { active: boolean; dotted: boolean }) {
-  if (dotted) {
-    return (
-      <div className="flex-1 flex items-center justify-center gap-[6px]">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <span
-            key={i}
-            className="block rounded-full bg-accent-blue"
-            style={{
-              width: 6,
-              height: 6,
-              animation: `nfdot 1s ${i * 0.15}s ease-in-out infinite`,
-            }}
-          />
-        ))}
-        <style>{`@keyframes nfdot{0%,100%{opacity:.3}50%{opacity:1}}`}</style>
-      </div>
-    )
-  }
+function Connector({ dotted }: { dotted: boolean }) {
   return (
     <div className="flex-1 flex items-center justify-center">
-      <div className={`h-[3px] w-full ${active ? 'bg-[#1a1a1a]' : 'bg-[#d0d0d0]'} rounded-full`} />
+      {dotted ? (
+        <ConnectingDotsIcon className="w-full max-w-[56px]" />
+      ) : (
+        <ConnectingLineIcon className="w-full max-w-[70px]" />
+      )}
     </div>
   )
 }
