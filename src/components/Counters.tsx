@@ -24,7 +24,7 @@ export function Counters({ onBack, onClose }: Props) {
         type="button"
         aria-label="Close menu"
         onClick={onClose}
-        className="absolute inset-0 bg-black/45"
+        className="absolute inset-0"
       />
       <div
         className="relative flex flex-col gap-[8px] bg-white rounded-[12px] shadow-panel"
