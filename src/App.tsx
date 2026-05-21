@@ -13,6 +13,7 @@ import {
 } from './components/DateTime'
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
+import { Network } from './components/Network'
 import { TIMER_KEYS, TimerDetail, TimerKey, Timers } from './components/Timers'
 import {
   defaultMotionConfig,
@@ -63,6 +64,7 @@ type Menu =
   | 'timezone'
   | 'timers'
   | 'timer-detail'
+  | 'network'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -227,6 +229,13 @@ export default function App() {
               onOpenLightSound={() => setMenu('light-sound')}
               onOpenDateTime={() => setMenu('datetime')}
               onOpenTimers={() => setMenu('timers')}
+              onOpenNetwork={() => setMenu('network')}
+            />
+          )}
+          {menu === 'network' && mode === 'unlocked' && (
+            <Network
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'timers' && mode === 'unlocked' && (

@@ -10,6 +10,7 @@ type Props = {
   onOpenLightSound: () => void
   onOpenDateTime: () => void
   onOpenTimers: () => void
+  onOpenNetwork: () => void
 }
 
 export function SettingsSubMenu({
@@ -20,6 +21,7 @@ export function SettingsSubMenu({
   onOpenLightSound,
   onOpenDateTime,
   onOpenTimers,
+  onOpenNetwork,
 }: Props) {
   const t = useT()
   return (
@@ -62,7 +64,7 @@ export function SettingsSubMenu({
         <MenuRow label={t('Date & Time')} onClick={onOpenDateTime} />
         <MenuRow label={t('PIN Code')} />
         <MenuRow label={t('Timers')} onClick={onOpenTimers} />
-        <MenuRow label={t('Network')} />
+        <MenuRow label={t('Network')} onClick={onOpenNetwork} />
         <MenuRow label={t('iDock Configuration')} onClick={onOpenIDockConfig} />
         <MenuRow label={t('Update Firmware')} />
       </div>

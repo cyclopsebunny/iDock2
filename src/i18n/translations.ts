@@ -162,6 +162,11 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Below Dock Lip Out Time': 'Tiempo de salida del labio bajo muelle',
     'Chock Pullout Time': 'Tiempo de retiro del calzo',
     'VS Bumpback Time': 'Tiempo de retroceso VS',
+
+    'Wireless Network Setup': 'Configuración de red inalámbrica',
+    'Select your Wi-fi Network': 'Seleccione su red Wi-Fi',
+    'Select Other Network...': 'Seleccionar otra red...',
+    Connect: 'Conectar',
   },
   fr: {
     Locked: 'Verrouillé',
@@ -311,6 +316,11 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Below Dock Lip Out Time': 'Temps de sortie de lèvre sous quai',
     'Chock Pullout Time': 'Temps de retrait de la cale',
     'VS Bumpback Time': 'Temps de recul VS',
+
+    'Wireless Network Setup': 'Configuration du réseau sans fil',
+    'Select your Wi-fi Network': 'Sélectionnez votre réseau Wi-Fi',
+    'Select Other Network...': 'Sélectionner un autre réseau...',
+    Connect: 'Se connecter',
   },
 }
 
