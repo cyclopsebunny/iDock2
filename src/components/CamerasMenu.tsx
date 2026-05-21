@@ -13,8 +13,7 @@ export function CamerasMenu({ cameras, onBack, onClose, onOpenCamera }: Props) {
   const visible = cameras
     .map((state, idx) => ({ state, index: idx + 1 }))
     .filter((c) => c.state !== 'never')
-  const noneConnected =
-    visible.length > 0 && visible.every((c) => c.state === 'disconnected')
+  const noneConnected = cameras.every((c) => c !== 'connected')
 
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
