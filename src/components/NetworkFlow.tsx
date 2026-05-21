@@ -387,8 +387,13 @@ function ConnectionGraphic({
   animateLeft: boolean
   animateRight: boolean
 }) {
+  // The Figma frame is 128px tall and items are top-aligned within it; the
+  // controller is 80px tall, the router 60px, the cloud ~32px, and the
+  // connectors only 24px. Aligning to the bottom of the row puts the router
+  // body, controller bottom, cloud body, and the dot/line connector all on
+  // the same horizontal line — matching the Figma layout.
   return (
-    <div className="flex items-center gap-[8px] px-[16px] pt-[8px] pb-[12px] h-[96px]">
+    <div className="flex items-end gap-[8px] px-[16px] pt-[16px] pb-[12px] h-[112px]">
       <ConnectingControllerIcon className="shrink-0" />
       <Connector dotted={animateLeft} />
       {routerActive ? <RouterActiveIcon className="shrink-0" /> : <RouterIdleIcon className="shrink-0" />}
@@ -400,7 +405,10 @@ function ConnectionGraphic({
 
 function Connector({ dotted }: { dotted: boolean }) {
   return (
-    <div className="flex-1 flex items-center justify-center">
+    <div
+      className="flex-1 flex justify-center"
+      style={{ alignItems: 'center', paddingBottom: 18 }}
+    >
       {dotted ? (
         <ConnectingDotsIcon className="w-full max-w-[56px]" />
       ) : (
