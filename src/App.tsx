@@ -8,6 +8,7 @@ import {
   MotionDetectionConfig,
 } from './components/MotionDetectionConfig'
 import { DeviceFrame } from './components/DeviceFrame'
+import { Counters } from './components/Counters'
 import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
 import { SettingsMenu } from './components/SettingsMenu'
@@ -27,6 +28,7 @@ type Menu =
   | 'camera-state'
   | 'motion-detection'
   | 'equipment-info'
+  | 'counters'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -76,10 +78,17 @@ export default function App() {
               onClose={() => setMenu('none')}
               onOpenSettings={() => setMenu('settings')}
               onOpenEquipmentInfo={() => setMenu('equipment-info')}
+              onOpenCounters={() => setMenu('counters')}
               onLock={() => {
                 setMenu('none')
                 setMode('locked')
               }}
+            />
+          )}
+          {menu === 'counters' && mode === 'unlocked' && (
+            <Counters
+              onBack={() => setMenu('main')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'equipment-info' && mode === 'unlocked' && (
