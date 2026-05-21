@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 
 type Props = {
@@ -16,6 +17,7 @@ export function CameraStateConfig({
   onBack,
   onClose,
 }: Props) {
+  const t = useT()
   const [draft, setDraft] = useState<boolean>(enabled)
   const dirty = draft !== enabled
 
@@ -47,7 +49,7 @@ export function CameraStateConfig({
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Camera State Configuration
+            {t('Camera State Configuration')}
           </h2>
           <button
             type="button"
@@ -62,7 +64,7 @@ export function CameraStateConfig({
 
         <div className="flex w-full items-center gap-[8px] rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg p-[8px]">
           <span className="flex-1 font-inter font-medium text-btn-secondary-label text-[24px] leading-none tracking-[0.0066em]">
-            Camera {cameraIndex} State
+            {t('Camera {n} State', { n: cameraIndex })}
           </span>
           <SwitchToggle value={draft} onChange={setDraft} />
         </div>
@@ -82,6 +84,7 @@ function SwitchToggle({
   value: boolean
   onChange: (v: boolean) => void
 }) {
+  const t = useT()
   const baseBtn =
     'flex items-center justify-center px-[8px] py-[16px] font-inter font-bold text-[20px] leading-none tracking-[0.0066em] whitespace-nowrap'
   const shadow = { boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }
@@ -97,7 +100,7 @@ function SwitchToggle({
             : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label'
         }`}
       >
-        Disabled
+        {t('Disabled')}
       </button>
       <button
         type="button"
@@ -109,13 +112,14 @@ function SwitchToggle({
             : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label'
         }`}
       >
-        Enabled
+        {t('Enabled')}
       </button>
     </div>
   )
 }
 
 function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => void }) {
+  const t = useT()
   if (enabled) {
     return (
       <button
@@ -123,7 +127,7 @@ function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => voi
         onClick={onClick}
         className="w-full px-[12px] py-[14px] rounded-[6px] border border-brand-primary bg-brand-primary text-white font-inter font-medium text-center text-[24px] tracking-[0.0066em] transition-opacity active:opacity-90"
       >
-        Save Configuration
+        {t('Save Configuration')}
       </button>
     )
   }
@@ -133,7 +137,7 @@ function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => voi
       disabled
       className="w-full px-[12px] py-[14px] rounded-[6px] border border-[#eaeaea] bg-btn-secondary-bg text-[#a6a6a6] font-inter font-medium text-center text-[24px] tracking-[0.0066em] cursor-not-allowed"
     >
-      Save Configuration
+      {t('Save Configuration')}
     </button>
   )
 }

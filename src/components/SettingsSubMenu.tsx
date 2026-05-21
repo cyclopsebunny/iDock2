@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 import { MenuRow } from './MenuRow'
 
@@ -5,9 +6,16 @@ type Props = {
   onBack: () => void
   onClose: () => void
   onOpenIDockConfig: () => void
+  onOpenLanguage: () => void
 }
 
-export function SettingsSubMenu({ onBack, onClose, onOpenIDockConfig }: Props) {
+export function SettingsSubMenu({
+  onBack,
+  onClose,
+  onOpenIDockConfig,
+  onOpenLanguage,
+}: Props) {
+  const t = useT()
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -31,7 +39,7 @@ export function SettingsSubMenu({ onBack, onClose, onOpenIDockConfig }: Props) {
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Settings
+            {t('Settings')}
           </h2>
           <button
             type="button"
@@ -43,14 +51,14 @@ export function SettingsSubMenu({ onBack, onClose, onOpenIDockConfig }: Props) {
             <CloseIcon className="h-full w-full" />
           </button>
         </div>
-        <MenuRow label="Language" />
-        <MenuRow label="Light & Sound" />
-        <MenuRow label="Date & Time" />
-        <MenuRow label="PIN Code" />
-        <MenuRow label="Timers" />
-        <MenuRow label="Network" />
-        <MenuRow label="iDock Configuration" onClick={onOpenIDockConfig} />
-        <MenuRow label="Update Firmware" />
+        <MenuRow label={t('Language')} onClick={onOpenLanguage} />
+        <MenuRow label={t('Light & Sound')} />
+        <MenuRow label={t('Date & Time')} />
+        <MenuRow label={t('PIN Code')} />
+        <MenuRow label={t('Timers')} />
+        <MenuRow label={t('Network')} />
+        <MenuRow label={t('iDock Configuration')} onClick={onOpenIDockConfig} />
+        <MenuRow label={t('Update Firmware')} />
       </div>
     </div>
   )

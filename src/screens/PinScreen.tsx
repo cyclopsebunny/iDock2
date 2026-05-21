@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Panel } from '../components/Panel'
 import { TopGraphic } from '../components/TopGraphic'
+import { useT } from '../i18n/LanguageContext'
 import { BackspaceIcon, CloseIcon } from '../icons/Icons'
 
 type Props = {
@@ -16,6 +17,7 @@ const ROWS: (string | 'back' | '0' | 'go')[][] = [
 ]
 
 export function PinScreen({ onCancel, onSubmit }: Props) {
+  const t = useT()
   const [pin, setPin] = useState('')
 
   const append = (d: string) =>
@@ -60,7 +62,7 @@ export function PinScreen({ onCancel, onSubmit }: Props) {
                   return (
                     <KeyButton key="go" variant="accent" onClick={submit}>
                       <span className="font-sfpro font-bold text-white text-[32px] leading-none tracking-[-0.02em]">
-                        Go
+                        {t('Go')}
                       </span>
                     </KeyButton>
                   )

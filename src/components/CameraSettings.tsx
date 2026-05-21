@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CameraIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
 
 type Props = {
@@ -23,6 +24,7 @@ export function CameraSettings({
   onOpenCameraState,
   onOpenMotionDetection,
 }: Props) {
+  const t = useT()
   const motionDisabled = !cameraConnected || !myqSubscribed
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
@@ -47,7 +49,7 @@ export function CameraSettings({
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Camera {cameraIndex} Settings
+            {t('Camera {n} Settings', { n: cameraIndex })}
           </h2>
           <button
             type="button"
@@ -63,14 +65,18 @@ export function CameraSettings({
         {cameraConnected && !myqSubscribed && <MyqRequiredAlert />}
         <StateRow
           icon={<CameraIcon className="h-full w-full" />}
-          label="Camera State"
-          status={cameraConnected ? (cameraEnabled ? 'Enabled' : 'Disabled') : undefined}
+          label={t('Camera State')}
+          status={
+            cameraConnected ? (cameraEnabled ? t('Enabled') : t('Disabled')) : undefined
+          }
           onClick={cameraConnected ? onOpenCameraState : undefined}
           disabled={!cameraConnected}
         />
         <StateRow
-          label="Motion Detection Configuration"
-          status={!motionDisabled ? (motionDetectionOn ? 'On' : 'Off') : undefined}
+          label={t('Motion Detection Configuration')}
+          status={
+            !motionDisabled ? (motionDetectionOn ? t('On') : t('Off')) : undefined
+          }
           onClick={!motionDisabled ? onOpenMotionDetection : undefined}
           disabled={motionDisabled}
         />
@@ -132,6 +138,9 @@ function StateRow({
 }
 
 function MyqRequiredAlert() {
+  const t = useT()
+  const text = t('myQ Subscription Required To\nUse Motion Detection')
+  const [a, b] = text.split('\n')
   return (
     <div
       className="flex items-center justify-center px-[12px] py-[14px] rounded-[6px] border-2"
@@ -146,13 +155,15 @@ function MyqRequiredAlert() {
         className="font-inter font-medium text-center text-[24px] leading-[1.2] tracking-[0.0066em]"
         style={{ color: '#513500' }}
       >
-        myQ Subscription Required To<br />Use Motion Detection
+        {a}
+        {b && (<><br />{b}</>)}
       </p>
     </div>
   )
 }
 
 function DisconnectedAlert() {
+  const t = useT()
   return (
     <div
       className="flex items-center justify-center px-[12px] py-[14px] rounded-[6px] border-2"
@@ -167,7 +178,7 @@ function DisconnectedAlert() {
         className="font-inter font-bold text-center text-[24px] leading-none tracking-[0.0066em]"
         style={{ color: '#732006' }}
       >
-        Camera Disconnected
+        {t('Camera Disconnected')}
       </p>
     </div>
   )

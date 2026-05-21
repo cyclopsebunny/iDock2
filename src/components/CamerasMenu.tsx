@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CameraIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
 
 export type CameraState = 'never' | 'connected' | 'disconnected'
@@ -10,6 +11,7 @@ type Props = {
 }
 
 export function CamerasMenu({ cameras, onBack, onClose, onOpenCamera }: Props) {
+  const t = useT()
   const visible = cameras
     .map((state, idx) => ({ state, index: idx + 1 }))
     .filter((c) => c.state !== 'never')
@@ -38,7 +40,7 @@ export function CamerasMenu({ cameras, onBack, onClose, onOpenCamera }: Props) {
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Cameras
+            {t('Cameras')}
           </h2>
           <button
             type="button"
@@ -51,7 +53,7 @@ export function CamerasMenu({ cameras, onBack, onClose, onOpenCamera }: Props) {
           </button>
         </div>
 
-        {noneConnected && <NoCamerasAlert />}
+        {noneConnected && <NoCamerasAlert label={t('No Cameras Connected')} />}
         {visible.map((c) => (
           <CameraRow
             key={c.index}
@@ -65,7 +67,7 @@ export function CamerasMenu({ cameras, onBack, onClose, onOpenCamera }: Props) {
   )
 }
 
-function NoCamerasAlert() {
+function NoCamerasAlert({ label }: { label: string }) {
   return (
     <div
       className="flex items-center justify-center px-[12px] py-[14px] rounded-[6px] border-2"
@@ -80,7 +82,7 @@ function NoCamerasAlert() {
         className="font-inter font-medium text-center text-[24px] leading-none tracking-[0.0066em]"
         style={{ color: '#513500' }}
       >
-        No Cameras Connected
+        {label}
       </p>
     </div>
   )
@@ -95,6 +97,7 @@ function CameraRow({
   disabled: boolean
   onClick: () => void
 }) {
+  const t = useT()
   const bg = disabled ? 'bg-white' : 'bg-btn-secondary-bg'
   const border = disabled ? 'border-[#eaeaea]' : 'border-btn-secondary-stroke'
   const color = disabled ? 'text-[#a6a6a6]' : 'text-btn-secondary-label'
@@ -111,7 +114,7 @@ function CameraRow({
         <CameraIcon className="h-full w-full" />
       </span>
       <span className={`flex-1 font-inter font-medium text-[24px] leading-none tracking-[0.0066em] ${color}`}>
-        Camera {index} Settings
+        {t('Camera {n} Settings', { n: index })}
       </span>
       <span
         className={`flex items-center justify-center ${color}`}

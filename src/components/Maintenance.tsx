@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useT } from '../i18n/LanguageContext'
 import { CalendarIcon } from '../icons/EquipmentIcons'
 import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
 import { MenuRow } from './MenuRow'
@@ -135,10 +136,11 @@ export function MaintenanceMenu({
   onOpenEntry,
   onOpenRecords,
 }: MaintenanceMenuProps) {
+  const t = useT()
   return (
-    <MaintenancePanel title="Maintenance" onBack={onBack} onClose={onClose}>
-      <MenuRow label="Maintenance Entry" onClick={onOpenEntry} />
-      <MenuRow label="Maintenance Records" status={nextPmDate} onClick={onOpenRecords} />
+    <MaintenancePanel title={t('Maintenance')} onBack={onBack} onClose={onClose}>
+      <MenuRow label={t('Maintenance Entry')} onClick={onOpenEntry} />
+      <MenuRow label={t('Maintenance Records')} status={nextPmDate} onClick={onOpenRecords} />
     </MaintenancePanel>
   )
 }
@@ -158,23 +160,25 @@ export function MaintenanceEntry({
   onOpenLeveler,
   onOpenDoor,
 }: MaintenanceEntryProps) {
+  const t = useT()
   return (
-    <MaintenancePanel title="Maintenance Entry" onBack={onBack} onClose={onClose}>
-      <MenuRow label="Preventative Maintenance" onClick={onOpenPM} />
-      <MenuRow label="Restraint" onClick={onOpenRestraint} />
-      <MenuRow label="Leveler" onClick={onOpenLeveler} />
-      <MenuRow label="Door" onClick={onOpenDoor} />
+    <MaintenancePanel title={t('Maintenance Entry')} onBack={onBack} onClose={onClose}>
+      <MenuRow label={t('Preventative Maintenance')} onClick={onOpenPM} />
+      <MenuRow label={t('Restraint')} onClick={onOpenRestraint} />
+      <MenuRow label={t('Leveler')} onClick={onOpenLeveler} />
+      <MenuRow label={t('Door')} onClick={onOpenDoor} />
     </MaintenancePanel>
   )
 }
 
 export function MaintenanceRecords({ onBack, onClose }: CommonProps) {
+  const t = useT()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canUp, setCanUp] = useState(false)
   const [canDown, setCanDown] = useState(false)
   const records = Array.from({ length: 14 }, (_, i) => ({
     id: i,
-    name: 'Record Item Name',
+    name: t('Record Item Name'),
     date: '8/6/24',
     time: '12:00',
   }))
@@ -195,7 +199,7 @@ export function MaintenanceRecords({ onBack, onClose }: CommonProps) {
   }, [])
 
   return (
-    <MaintenancePanel title="Maintenance Records" onBack={onBack} onClose={onClose}>
+    <MaintenancePanel title={t('Maintenance Records')} onBack={onBack} onClose={onClose}>
       <div
         ref={scrollRef}
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar flex flex-col gap-[8px]"
@@ -243,16 +247,29 @@ export function PreventativeMaintenance({
   onBack,
   onClose,
 }: PMProps) {
+  const t = useT()
   const today = new Date()
   const next = new Date(today.getTime() + days * 86400000)
   const formatted = `${next.getMonth() + 1}/${next.getDate()}/${next.getFullYear()}`
 
   return (
-    <MaintenancePanel title="Preventative Maintenance" onBack={onBack} onClose={onClose} gap={12}>
+    <MaintenancePanel
+      title={t('Preventative Maintenance')}
+      onBack={onBack}
+      onClose={onClose}
+      gap={12}
+    >
       <InfoAlert>
-        Once PM has been completed,<br />reset the warning and set the<br />next PM date.
+        {t('Once PM has been completed,\nreset the warning and set the\nnext PM date.')
+          .split('\n')
+          .map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br />}
+            </span>
+          ))}
       </InfoAlert>
-      <DestructiveButton onClick={onResetWarning}>Reset PM Due Warning</DestructiveButton>
+      <DestructiveButton onClick={onResetWarning}>{t('Reset PM Due Warning')}</DestructiveButton>
 
       <PmDateStepper
         days={days}
@@ -263,7 +280,7 @@ export function PreventativeMaintenance({
 
       <div className="flex-1" />
 
-      <AccentButton onClick={() => onSave(days)}>Set Next PM Date</AccentButton>
+      <AccentButton onClick={() => onSave(days)}>{t('Set Next PM Date')}</AccentButton>
     </MaintenancePanel>
   )
 }
@@ -279,12 +296,13 @@ function PmDateStepper({
   onUp: () => void
   onDown: () => void
 }) {
+  const t = useT()
   return (
     <div className="flex flex-col gap-[12px] py-[8px]">
       <div className="flex items-center gap-[16px] px-[16px]">
         <CalendarIcon className="text-btn-secondary-label" />
         <p className="flex-1 font-inter font-medium text-btn-secondary-label text-[28px] leading-normal tracking-[0.0066em]">
-          Next PM Date
+          {t('Next PM Date')}
         </p>
       </div>
 
@@ -296,7 +314,7 @@ function PmDateStepper({
               {days}
             </p>
             <p className="font-inter font-medium text-btn-secondary-label text-[28px] leading-normal text-center tracking-[0.0066em]">
-              Days
+              {t('Days')}
             </p>
           </div>
           <StepperButton direction="down" onClick={onDown} position="bottom" />
@@ -366,16 +384,17 @@ export function MaintenanceTaskScreen({
   onBack,
   onClose,
 }: TaskScreenProps) {
+  const t = useT()
   const [logged, setLogged] = useState<LoggedAction | null>(null)
   return (
-    <MaintenancePanel title={title} onBack={onBack} onClose={onClose} gap={12}>
-      <InfoAlert>Select the maintenance task that was completed:</InfoAlert>
+    <MaintenancePanel title={t(title)} onBack={onBack} onClose={onClose} gap={12}>
+      <InfoAlert>{t('Select the maintenance task that was completed:')}</InfoAlert>
       {options.map((label) => (
         <AccentButton
           key={label}
           onClick={() => setLogged({ kind: labelForButton(label), at: new Date() })}
         >
-          {label}
+          {t(label)}
         </AccentButton>
       ))}
       {logged && <LoggedConfirmation action={logged} />}
@@ -384,6 +403,7 @@ export function MaintenanceTaskScreen({
 }
 
 function LoggedConfirmation({ action }: { action: LoggedAction }) {
+  const t = useT()
   const d = action.at
   const date = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
   let h = d.getHours()
@@ -392,13 +412,19 @@ function LoggedConfirmation({ action }: { action: LoggedAction }) {
   if (h === 0) h = 12
   const mm = d.getMinutes().toString().padStart(2, '0')
   const time = `${h}:${mm} ${ampm}`
+  const labelKey =
+    action.kind === 'Repair'
+      ? 'Repair logged:'
+      : action.kind === 'Maintenance'
+        ? 'Maintenance logged:'
+        : 'Part replacement logged:'
   return (
     <div
       className="self-center flex flex-col items-center justify-center gap-[6px] rounded-[8px] border px-[24px] py-[12px]"
       style={{ background: '#eafde3', borderColor: '#d4ebcc', color: '#1d5807' }}
     >
       <p className="font-inter font-medium text-[24px] leading-none text-center tracking-[0.0066em] whitespace-nowrap">
-        {action.kind} logged:
+        {t(labelKey)}
       </p>
       <div className="flex items-start gap-[10px]">
         <p className="font-inter font-medium text-[24px] leading-none text-center tracking-[0.0066em] whitespace-nowrap">

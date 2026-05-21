@@ -1,5 +1,6 @@
 import { Panel } from '../components/Panel'
 import { TopGraphic } from '../components/TopGraphic'
+import { useT } from '../i18n/LanguageContext'
 import { SettingsGearIcon } from '../icons/Icons'
 
 type Props = {
@@ -9,13 +10,14 @@ type Props = {
 }
 
 export function UnlockedScreen({ doorNumber, status, onOpenSettings }: Props) {
+  const t = useT()
   return (
     <>
       <TopGraphic />
       <Panel padding={12} gap={12}>
         <div className="flex h-[66px] items-center gap-[12px] px-[16px]">
           <span className="font-inter font-semibold text-primary-text text-[40px] leading-none whitespace-nowrap">
-            Door
+            {t('Door')}
           </span>
           <span className="flex-1 font-inter font-semibold text-primary-text text-[40px] leading-none">
             {doorNumber}
@@ -33,7 +35,7 @@ export function UnlockedScreen({ doorNumber, status, onOpenSettings }: Props) {
         <div className="flex flex-1 flex-col items-center justify-start gap-[16px] px-[8px]">
           <div className="flex flex-1 items-center justify-center w-full">
             <p className="font-inter font-semibold text-primary-text text-[64px] leading-tight text-center">
-              {status}
+              {t(status)}
             </p>
           </div>
           <div className="h-[156px] w-full" />

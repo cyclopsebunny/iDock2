@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 
 export type Point = { x: number; y: number }
@@ -49,6 +50,7 @@ export function MotionDetectionConfig({
   onBack,
   onClose,
 }: Props) {
+  const t = useT()
   // Local draft state — initialized from the committed motion config.
   const [on, setOn] = useState(motion.on)
   const [sensitivity, setSensitivity] = useState(motion.sensitivity)
@@ -120,7 +122,15 @@ export function MotionDetectionConfig({
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Motion Detection<br />Configuration
+            {(() => {
+              const parts = t('Motion Detection\nConfiguration').split('\n')
+              return (
+                <>
+                  {parts[0]}
+                  {parts[1] && (<><br />{parts[1]}</>)}
+                </>
+              )
+            })()}
           </h2>
           <button
             type="button"
@@ -154,13 +164,13 @@ export function MotionDetectionConfig({
             disabled={!cameraConnected || phase === 'countdown'}
             onClick={() => setPhase('countdown')}
           >
-            Take Picture
+            {t('Take Picture')}
           </ActionButton>
           <ActionButton
             disabled={!cameraConnected || phase !== 'taken'}
             onClick={() => setCorners(defaultCorners())}
           >
-            Back to Default
+            {t('Back to Default')}
           </ActionButton>
         </div>
 
@@ -185,10 +195,11 @@ function MotionToggleRow({
   on: boolean
   onChange: (v: boolean) => void
 }) {
+  const t = useT()
   return (
     <div className="flex w-full items-center gap-[8px] rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg pl-px pr-[9px] py-[9px]">
       <span className="flex-1 pl-[16px] font-inter font-medium text-btn-secondary-label text-[24px] leading-[1.15] tracking-[0.0066em]">
-        Camera {cameraIndex} Motion Detection
+        {t('Camera {n} Motion Detection', { n: cameraIndex })}
       </span>
       <div className="flex items-stretch w-[180px]" style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }}>
         <button
@@ -200,7 +211,7 @@ function MotionToggleRow({
               : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label'
           }`}
         >
-          OFF
+          {t('OFF')}
         </button>
         <button
           type="button"
@@ -211,14 +222,30 @@ function MotionToggleRow({
               : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label'
           }`}
         >
-          ON
+          {t('ON')}
         </button>
       </div>
     </div>
   )
 }
 
+function IdlePrompt() {
+  const t = useT()
+  const [a, b] = t('Press Take Picture and\nmove away from the camera').split('\n')
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <p className="text-center font-inter font-medium text-[24px] leading-[1.2]" style={{ color: '#003b5c' }}>
+        {a}
+        {b && (<><br />{b}</>)}
+      </p>
+    </div>
+  )
+}
+
 function DisconnectedPanel() {
+  const t = useT()
+  const a = t('Camera Disconnected')
+  const b = t('Check camera connection')
   return (
     <div
       className="relative shrink-0 flex items-center justify-center rounded-[6px] border"
@@ -231,10 +258,10 @@ function DisconnectedPanel() {
     >
       <div className="text-center px-[24px]" style={{ color: '#732006' }}>
         <p className="font-inter font-bold text-[32px] leading-none mb-[14px] tracking-[0.0066em]">
-          Camera Disconnected
+          {a}
         </p>
         <p className="font-inter font-medium text-[24px] leading-[1.2] tracking-[0.0066em]">
-          Check camera connection
+          {b}
         </p>
       </div>
     </div>
@@ -257,13 +284,7 @@ function PhotoArea({
       className="relative shrink-0 overflow-hidden rounded-[6px] border border-btn-secondary-stroke"
       style={{ width: PHOTO_W, height: PHOTO_H, background: '#edf9ff' }}
     >
-      {phase === 'idle' && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <p className="text-center font-inter font-medium text-[24px] leading-[1.2]" style={{ color: '#003b5c' }}>
-            Press Take Picture and<br />move away from the camera
-          </p>
-        </div>
-      )}
+      {phase === 'idle' && <IdlePrompt />}
       {phase === 'countdown' && (
         <div className="absolute inset-0 flex items-center justify-center">
           <p className="font-inter font-semibold text-[120px] leading-none" style={{ color: '#003b5c' }}>
@@ -413,6 +434,7 @@ function SensitivityPanel({
   value: number
   onChange: (v: number) => void
 }) {
+  const t = useT()
   const labels = ['Lowest', 'Low', 'Medium', 'High', 'Highest']
   const dec = () => onChange(Math.max(0, value - 1))
   const inc = () => onChange(Math.min(4, value + 1))
@@ -423,10 +445,10 @@ function SensitivityPanel({
       <div className="flex items-center gap-[16px] py-[8px] pl-[16px] pr-[16px]">
         <SensitivityIcon className="shrink-0" />
         <span className="flex-1 font-inter font-medium text-btn-secondary-label text-[24px] leading-none tracking-[0.0066em]">
-          Sensitivity
+          {t('Sensitivity')}
         </span>
         <span className="font-inter font-bold text-btn-secondary-label text-[20px] leading-none tracking-[0.0066em] whitespace-nowrap">
-          {labels[value]}
+          {t(labels[value])}
         </span>
       </div>
       <div className="flex items-stretch gap-0 px-[8px] py-[8px]">
@@ -490,6 +512,7 @@ function ChevronRight() {
 }
 
 function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => void }) {
+  const t = useT()
   if (enabled) {
     return (
       <button
@@ -497,7 +520,7 @@ function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => voi
         onClick={onClick}
         className="w-full px-[12px] py-[14px] rounded-[6px] border border-brand-primary bg-brand-primary text-white font-inter font-medium text-center text-[24px] tracking-[0.0066em] transition-opacity active:opacity-90"
       >
-        Save Configuration
+        {t('Save Configuration')}
       </button>
     )
   }
@@ -507,7 +530,7 @@ function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => voi
       disabled
       className="w-full px-[12px] py-[14px] rounded-[6px] border border-[#eaeaea] bg-btn-secondary-bg text-[#a6a6a6] font-inter font-medium text-center text-[24px] tracking-[0.0066em] cursor-not-allowed"
     >
-      Save Configuration
+      {t('Save Configuration')}
     </button>
   )
 }

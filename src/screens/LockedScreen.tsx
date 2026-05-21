@@ -1,5 +1,6 @@
 import { Panel } from '../components/Panel'
 import { TopGraphic } from '../components/TopGraphic'
+import { useT } from '../i18n/LanguageContext'
 import { KeypadIcon } from '../icons/Icons'
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
 }
 
 export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
+  const t = useT()
   return (
     <button
       type="button"
@@ -19,7 +21,7 @@ export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
       <Panel padding={12} gap={12}>
         <div className="flex h-[66px] w-full items-center gap-[12px] pl-[77px] pr-[16px]">
           <span className="flex-1 text-center font-inter font-semibold text-primary-text text-[40px] leading-none">
-            Locked
+            {t('Locked')}
           </span>
           <span
             className="shrink-0 text-primary-text"
@@ -31,7 +33,7 @@ export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
         </div>
         <div className="flex flex-1 flex-col items-center justify-between min-h-0 pt-[12px] pb-[8px] w-full">
           <div className="flex flex-col items-center text-primary-text font-inter font-semibold leading-none w-full">
-            <div className="text-[64px] text-center whitespace-nowrap">Door</div>
+            <div className="text-[64px] text-center whitespace-nowrap">{t('Door')}</div>
             <div
               className="text-[180px] leading-none text-left"
               style={{ width: 207, height: 160 }}
@@ -40,7 +42,7 @@ export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
             </div>
           </div>
           <div className="w-full text-center font-inter font-medium text-primary-text text-[32px]">
-            Scan Badge to Unlock
+            {t('Scan Badge to Unlock')}
           </div>
         </div>
       </Panel>

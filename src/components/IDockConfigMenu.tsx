@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 import { MenuRow } from './MenuRow'
 
@@ -8,6 +9,7 @@ type Props = {
 }
 
 export function IDockConfigMenu({ onBack, onClose, onOpenCameras }: Props) {
+  const t = useT()
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -31,7 +33,7 @@ export function IDockConfigMenu({ onBack, onClose, onOpenCameras }: Props) {
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            iDock Configuration
+            {t('iDock Configuration')}
           </h2>
           <button
             type="button"
@@ -43,14 +45,14 @@ export function IDockConfigMenu({ onBack, onClose, onOpenCameras }: Props) {
             <CloseIcon className="h-full w-full" />
           </button>
         </div>
-        <MenuRow label="Diagnostics" />
-        <MenuRow label="Maxum Settings" />
-        <MenuRow label="Field Installation Settings" />
-        <MenuRow label="Factory Installation Settings" />
-        <MenuRow label="Cameras" onClick={onOpenCameras} />
-        <MenuRow label="Reader" status="Disabled" />
-        <MenuRow label="Bypass Configuration" />
-        <MenuRow label="User Access Configuration" />
+        <MenuRow label={t('Diagnostics')} />
+        <MenuRow label={t('Maxum Settings')} />
+        <MenuRow label={t('Field Installation Settings')} />
+        <MenuRow label={t('Factory Installation Settings')} />
+        <MenuRow label={t('Cameras')} onClick={onOpenCameras} />
+        <MenuRow label={t('Reader')} status={t('Disabled')} />
+        <MenuRow label={t('Bypass Configuration')} />
+        <MenuRow label={t('User Access Configuration')} />
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import { CloseIcon } from '../icons/Icons'
 import { MenuRow } from './MenuRow'
 
@@ -18,6 +19,7 @@ export function SettingsMenu({
   onOpenCounters,
   onOpenMaintenance,
 }: Props) {
+  const t = useT()
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -32,7 +34,7 @@ export function SettingsMenu({
       >
         <div className="flex h-[66px] items-center gap-[6px] pl-[69px] pr-[8px]">
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Main Menu
+            {t('Main Menu')}
           </h2>
           <button
             type="button"
@@ -45,13 +47,13 @@ export function SettingsMenu({
           </button>
         </div>
         <PrimaryButton variant="accent" onClick={onLock}>
-          Lock iDock Controller
+          {t('Lock iDock Controller')}
         </PrimaryButton>
-        <PrimaryButton variant="destructive">Bypass Restrait</PrimaryButton>
-        <MenuRow label="Equipment Info" onClick={onOpenEquipmentInfo} />
-        <MenuRow label="Counters" onClick={onOpenCounters} />
-        <MenuRow label="Maintenance" onClick={onOpenMaintenance} />
-        <MenuRow label="Settings" onClick={onOpenSettings} />
+        <PrimaryButton variant="destructive">{t('Bypass Restrait')}</PrimaryButton>
+        <MenuRow label={t('Equipment Info')} onClick={onOpenEquipmentInfo} />
+        <MenuRow label={t('Counters')} onClick={onOpenCounters} />
+        <MenuRow label={t('Maintenance')} onClick={onOpenMaintenance} />
+        <MenuRow label={t('Settings')} onClick={onOpenSettings} />
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useT } from '../i18n/LanguageContext'
 import {
   ControllerIcon,
   DoorIcon,
@@ -16,6 +17,7 @@ type Props = {
 const PAGE_STEP = 220
 
 export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
+  const t = useT()
   const [showDetails, setShowDetails] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canUp, setCanUp] = useState(false)
@@ -67,7 +69,7 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Equipment Info
+            {t('Equipment Info')}
           </h2>
           <button
             type="button"
@@ -99,9 +101,9 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
               icon={<LockIcon className="h-full w-full text-btn-secondary-label" />}
               iconBox={116}
               rows={[
-                { label: 'Model', value: 'Restraint Model' },
-                { label: 'Serial #', value: '1234567890' },
-                { label: 'Installed on:', value: '07/24/2024' },
+                { label: t('Model'), value: t('Restraint Model') },
+                { label: t('Serial #'), value: '1234567890' },
+                { label: t('Installed on:'), value: '07/24/2024' },
               ]}
             />
 
@@ -111,9 +113,9 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
               icon={<LevelerIcon className="h-full w-full text-btn-secondary-label" />}
               iconBox={116}
               rows={[
-                { label: 'Model', value: 'Leveler Model' },
-                { label: 'Serial #', value: '1234567890' },
-                { label: 'Installed on:', value: '07/24/2024' },
+                { label: t('Model'), value: t('Leveler Model') },
+                { label: t('Serial #'), value: '1234567890' },
+                { label: t('Installed on:'), value: '07/24/2024' },
               ]}
             />
 
@@ -127,8 +129,8 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
               }
               iconBox={116}
               rows={[
-                { label: 'Door #', value: doorNumber, valueSize: 40 },
-                { label: 'Status', value: 'CLOSED' },
+                { label: t('Door #'), value: doorNumber, valueSize: 40 },
+                { label: t('Status'), value: t('CLOSED') },
               ]}
             />
           </div>
@@ -152,6 +154,7 @@ function ControllerSection({
   showDetails: boolean
   onToggle: () => void
 }) {
+  const t = useT()
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-[12px] py-[24px]">
@@ -161,7 +164,7 @@ function ControllerSection({
         <div className="flex flex-col justify-between self-stretch">
           <div className="flex flex-col">
             <p className="font-inter text-[18px] text-accent-blue leading-none whitespace-nowrap">
-              iDock 2.0 Controller
+              {t('iDock 2.0 Controller')}
             </p>
             <p className="font-inter font-semibold text-[30px] text-btn-secondary-label leading-[29.187px] whitespace-nowrap mt-[6px]">
               1234567890
@@ -172,7 +175,7 @@ function ControllerSection({
             onClick={onToggle}
             className="bg-btn-secondary-bg border border-btn-secondary-stroke rounded-[4px] px-[12px] py-[6px] mt-[8px] w-[181px] font-inter font-medium text-[20px] text-btn-secondary-label text-center tracking-[0.0066em] transition-colors active:bg-[#ebebeb]"
           >
-            {showDetails ? 'Hide Details' : 'Show Details'}
+            {showDetails ? t('Hide Details') : t('Show Details')}
           </button>
         </div>
       </div>
@@ -182,17 +185,18 @@ function ControllerSection({
 }
 
 function ControllerDetails() {
+  const t = useT()
   return (
     <div className="flex flex-col gap-[10px] pb-[4px]">
       <div className="flex flex-col">
-        <DetailRow label="Main Brd. SW Version:" value="1.0.0" />
-        <DetailRow label="Main Brd. HW Version:" value="1.000" />
+        <DetailRow label={t('Main Brd. SW Version:')} value="1.0.0" />
+        <DetailRow label={t('Main Brd. HW Version:')} value="1.000" />
       </div>
       <ThinDivider />
       <div className="flex flex-col">
-        <DetailRow label="Commission Date:" value="mm/dd/yyyy" />
-        <DetailRow label="Install Date:" value="mm/dd/yyyy" />
-        <DetailRow label="Current Set Date:" value="mm/dd/yyyy" />
+        <DetailRow label={t('Commission Date:')} value="mm/dd/yyyy" />
+        <DetailRow label={t('Install Date:')} value="mm/dd/yyyy" />
+        <DetailRow label={t('Current Set Date:')} value="mm/dd/yyyy" />
       </div>
       <ThinDivider />
     </div>

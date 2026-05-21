@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CameraSettings } from './components/CameraSettings'
 import { CamerasMenu, CameraState } from './components/CamerasMenu'
 import { CameraStateConfig } from './components/CameraStateConfig'
+import { LanguageScreen } from './components/LanguageScreen'
 import {
   defaultMotionConfig,
   MotionConfig,
@@ -43,6 +44,7 @@ type Menu =
   | 'maintenance-restraint'
   | 'maintenance-leveler'
   | 'maintenance-door'
+  | 'language'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -185,6 +187,13 @@ export default function App() {
               onBack={() => setMenu('main')}
               onClose={() => setMenu('none')}
               onOpenIDockConfig={() => setMenu('idock-config')}
+              onOpenLanguage={() => setMenu('language')}
+            />
+          )}
+          {menu === 'language' && mode === 'unlocked' && (
+            <LanguageScreen
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'idock-config' && mode === 'unlocked' && (

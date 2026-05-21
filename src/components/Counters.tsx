@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LanguageContext'
 import {
   DoorIcon,
   ForkliftIcon,
@@ -16,6 +17,7 @@ type Props = {
 const ALERT_RED = '#9E2D08'
 
 export function Counters({ onBack, onClose }: Props) {
+  const t = useT()
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -39,7 +41,7 @@ export function Counters({ onBack, onClose }: Props) {
             <BackArrowIcon className="h-full w-full" />
           </button>
           <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            Counters
+            {t('Counters')}
           </h2>
           <button
             type="button"
@@ -57,13 +59,13 @@ export function Counters({ onBack, onClose }: Props) {
             <StatCard
               icon={<LockIcon className="h-full w-full" />}
               iconBox={50}
-              label="Restraint Cycles"
+              label={t('Restraint Cycles')}
               value="23658"
             />
             <StatCard
               icon={<LockXIcon className="h-full w-full" />}
               iconBox={50}
-              label="Restraint Bypass"
+              label={t('Restraint Bypass')}
               value="854"
               color={ALERT_RED}
             />
@@ -72,13 +74,13 @@ export function Counters({ onBack, onClose }: Props) {
             <StatCard
               icon={<DoorIcon className="h-[42px]" />}
               iconBox={50}
-              label="Door Cycles"
+              label={t('Door Cycles')}
               value="23658"
             />
             <StatCard
               icon={<LevelerIcon className="h-full w-full" />}
               iconBox={50}
-              label="Leveler Cycles"
+              label={t('Leveler Cycles')}
               value="23658"
             />
           </div>
@@ -86,21 +88,21 @@ export function Counters({ onBack, onClose }: Props) {
             <StatCard
               icon={<TrailerIcon className="w-[46px] h-[44px]" />}
               iconBox={50}
-              label="Trailer Present"
+              label={t('Trailer Present')}
               value="11503"
             />
             <StatCard
               icon={<ForkliftIcon className="h-[50px] w-[50px]" />}
               iconBox={50}
-              label="Forklift Activity"
+              label={t('Forklift Activity')}
               value="5,842,563"
             />
           </div>
         </div>
 
-        <NavRow label="Recordings" value="500" />
-        <NavRow label="Fault Counters" value="324" />
-        <NavRow label="Door Code Counters" value="12" />
+        <NavRow label={t('Recordings')} value="500" />
+        <NavRow label={t('Fault Counters')} value="324" />
+        <NavRow label={t('Door Code Counters')} value="12" />
       </div>
     </div>
   )
