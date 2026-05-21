@@ -76,7 +76,7 @@ export function Counters({ onBack, onClose }: Props) {
               value="23658"
             />
             <StatCard
-              icon={<LevelerIcon className="w-[46.4px] h-[28.2px]" />}
+              icon={<LevelerIcon className="h-full w-full" />}
               iconBox={50}
               label="Leveler Cycles"
               value="23658"
