@@ -5,6 +5,7 @@ type Props = {
   cameraEnabled: boolean
   motionDetectionOn: boolean
   cameraConnected: boolean
+  myqSubscribed: boolean
   onBack: () => void
   onClose: () => void
   onOpenCameraState: () => void
@@ -16,11 +17,13 @@ export function CameraSettings({
   cameraEnabled,
   motionDetectionOn,
   cameraConnected,
+  myqSubscribed,
   onBack,
   onClose,
   onOpenCameraState,
   onOpenMotionDetection,
 }: Props) {
+  const motionDisabled = !cameraConnected || !myqSubscribed
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -57,6 +60,7 @@ export function CameraSettings({
           </button>
         </div>
         {!cameraConnected && <DisconnectedAlert />}
+        {cameraConnected && !myqSubscribed && <MyqRequiredAlert />}
         <StateRow
           icon={<CameraIcon className="h-full w-full" />}
           label="Camera State"
@@ -66,9 +70,9 @@ export function CameraSettings({
         />
         <StateRow
           label="Motion Detection Configuration"
-          status={cameraConnected ? (motionDetectionOn ? 'On' : 'Off') : undefined}
-          onClick={cameraConnected ? onOpenMotionDetection : undefined}
-          disabled={!cameraConnected}
+          status={!motionDisabled ? (motionDetectionOn ? 'On' : 'Off') : undefined}
+          onClick={!motionDisabled ? onOpenMotionDetection : undefined}
+          disabled={motionDisabled}
         />
       </div>
     </div>
@@ -124,6 +128,27 @@ function StateRow({
         <ChevronRightIcon className="h-full w-full" />
       </span>
     </button>
+  )
+}
+
+function MyqRequiredAlert() {
+  return (
+    <div
+      className="flex items-center justify-center px-[12px] py-[14px] rounded-[6px] border-2"
+      style={{
+        background: '#fff7e2',
+        borderColor: '#ffed8f',
+        width: 398,
+        alignSelf: 'center',
+      }}
+    >
+      <p
+        className="font-inter font-medium text-center text-[24px] leading-[1.2] tracking-[0.0066em]"
+        style={{ color: '#513500' }}
+      >
+        myQ Subscription Required To<br />Use Motion Detection
+      </p>
+    </div>
   )
 }
 

@@ -35,6 +35,7 @@ export default function App() {
     defaultMotionConfig(),
     defaultMotionConfig(),
   ])
+  const [myqSubscribed, setMyqSubscribed] = useState(true)
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -109,6 +110,7 @@ export default function App() {
               cameraEnabled={cameraEnabled[selectedCamera - 1]}
               motionDetectionOn={motionConfig[selectedCamera - 1].on}
               cameraConnected={cameras[selectedCamera - 1] === 'connected'}
+              myqSubscribed={myqSubscribed}
               onBack={() => setMenu('cameras')}
               onClose={() => setMenu('none')}
               onOpenCameraState={() => setMenu('camera-state')}
@@ -146,6 +148,8 @@ export default function App() {
           setMode={setMode}
           cameras={cameras}
           setCamera={setCamera}
+          myqSubscribed={myqSubscribed}
+          setMyqSubscribed={setMyqSubscribed}
         />
       </div>
     </div>
@@ -157,9 +161,18 @@ type DevControlsProps = {
   setMode: (m: Mode) => void
   cameras: CameraState[]
   setCamera: (idx: number, state: CameraState) => void
+  myqSubscribed: boolean
+  setMyqSubscribed: (v: boolean) => void
 }
 
-function DevControls({ mode, setMode, cameras, setCamera }: DevControlsProps) {
+function DevControls({
+  mode,
+  setMode,
+  cameras,
+  setCamera,
+  myqSubscribed,
+  setMyqSubscribed,
+}: DevControlsProps) {
   return (
     <div className="flex flex-col items-center gap-3 text-xs text-white/60 font-inter">
       <div className="flex gap-2">
@@ -185,6 +198,23 @@ function DevControls({ mode, setMode, cameras, setCamera }: DevControlsProps) {
           />
         ))}
       </div>
+      <button
+        type="button"
+        onClick={() => setMyqSubscribed(!myqSubscribed)}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded border ${
+          myqSubscribed
+            ? 'border-emerald-500/60 text-emerald-300'
+            : 'border-amber-500/60 text-amber-300'
+        }`}
+      >
+        <span
+          className={`inline-block h-2 w-2 rounded-full ${
+            myqSubscribed ? 'bg-emerald-400' : 'bg-amber-400'
+          }`}
+        />
+        myQ subscription: {myqSubscribed ? 'Active' : 'Inactive'}
+        <span className="opacity-60">— click to toggle</span>
+      </button>
     </div>
   )
 }
