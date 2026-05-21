@@ -7,6 +7,7 @@ type Props = {
   onOpenSettings: () => void
   onOpenEquipmentInfo: () => void
   onOpenCounters: () => void
+  onOpenMaintenance: () => void
 }
 
 export function SettingsMenu({
@@ -15,6 +16,7 @@ export function SettingsMenu({
   onOpenSettings,
   onOpenEquipmentInfo,
   onOpenCounters,
+  onOpenMaintenance,
 }: Props) {
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
@@ -48,7 +50,7 @@ export function SettingsMenu({
         <PrimaryButton variant="destructive">Bypass Restrait</PrimaryButton>
         <MenuRow label="Equipment Info" onClick={onOpenEquipmentInfo} />
         <MenuRow label="Counters" onClick={onOpenCounters} />
-        <MenuRow label="Maintenance" />
+        <MenuRow label="Maintenance" onClick={onOpenMaintenance} />
         <MenuRow label="Settings" onClick={onOpenSettings} />
       </div>
     </div>

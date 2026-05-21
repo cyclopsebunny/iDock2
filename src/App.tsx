@@ -11,6 +11,13 @@ import { DeviceFrame } from './components/DeviceFrame'
 import { Counters } from './components/Counters'
 import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
+import {
+  MaintenanceEntry,
+  MaintenanceMenu,
+  MaintenanceRecords,
+  MaintenanceTaskScreen,
+  PreventativeMaintenance,
+} from './components/Maintenance'
 import { SettingsMenu } from './components/SettingsMenu'
 import { SettingsSubMenu } from './components/SettingsSubMenu'
 import { LockedScreen } from './screens/LockedScreen'
@@ -29,6 +36,13 @@ type Menu =
   | 'motion-detection'
   | 'equipment-info'
   | 'counters'
+  | 'maintenance'
+  | 'maintenance-entry'
+  | 'maintenance-records'
+  | 'maintenance-pm'
+  | 'maintenance-restraint'
+  | 'maintenance-leveler'
+  | 'maintenance-door'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -40,6 +54,8 @@ export default function App() {
     defaultMotionConfig(),
   ])
   const [myqSubscribed, setMyqSubscribed] = useState(true)
+  const [pmDays, setPmDays] = useState(60)
+  const [nextPmDate, setNextPmDate] = useState('6/1/2024')
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -79,10 +95,79 @@ export default function App() {
               onOpenSettings={() => setMenu('settings')}
               onOpenEquipmentInfo={() => setMenu('equipment-info')}
               onOpenCounters={() => setMenu('counters')}
+              onOpenMaintenance={() => setMenu('maintenance')}
               onLock={() => {
                 setMenu('none')
                 setMode('locked')
               }}
+            />
+          )}
+          {menu === 'maintenance' && mode === 'unlocked' && (
+            <MaintenanceMenu
+              nextPmDate={nextPmDate}
+              onBack={() => setMenu('main')}
+              onClose={() => setMenu('none')}
+              onOpenEntry={() => setMenu('maintenance-entry')}
+              onOpenRecords={() => setMenu('maintenance-records')}
+            />
+          )}
+          {menu === 'maintenance-entry' && mode === 'unlocked' && (
+            <MaintenanceEntry
+              onBack={() => setMenu('maintenance')}
+              onClose={() => setMenu('none')}
+              onOpenPM={() => setMenu('maintenance-pm')}
+              onOpenRestraint={() => setMenu('maintenance-restraint')}
+              onOpenLeveler={() => setMenu('maintenance-leveler')}
+              onOpenDoor={() => setMenu('maintenance-door')}
+            />
+          )}
+          {menu === 'maintenance-records' && mode === 'unlocked' && (
+            <MaintenanceRecords
+              onBack={() => setMenu('maintenance')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'maintenance-pm' && mode === 'unlocked' && (
+            <PreventativeMaintenance
+              days={pmDays}
+              onSetDays={setPmDays}
+              onResetWarning={() => {}}
+              onSave={(d) => {
+                const next = new Date(Date.now() + d * 86400000)
+                setNextPmDate(
+                  `${next.getMonth() + 1}/${next.getDate()}/${next.getFullYear()}`,
+                )
+                setMenu('maintenance-entry')
+              }}
+              onBack={() => setMenu('maintenance-entry')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'maintenance-restraint' && mode === 'unlocked' && (
+            <MaintenanceTaskScreen
+              title="Restraint"
+              options={['General Maintenance', 'Repair Restraint', 'Replace Part']}
+              onPick={() => setMenu('maintenance-entry')}
+              onBack={() => setMenu('maintenance-entry')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'maintenance-leveler' && mode === 'unlocked' && (
+            <MaintenanceTaskScreen
+              title="Leveler"
+              options={['General Maintenance', 'Repair Leveler', 'Replace Part']}
+              onPick={() => setMenu('maintenance-entry')}
+              onBack={() => setMenu('maintenance-entry')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'maintenance-door' && mode === 'unlocked' && (
+            <MaintenanceTaskScreen
+              title="Door"
+              options={['General Maintenance', 'Repair Door', 'Replace Part']}
+              onPick={() => setMenu('maintenance-entry')}
+              onBack={() => setMenu('maintenance-entry')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'counters' && mode === 'unlocked' && (
