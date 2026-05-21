@@ -254,32 +254,12 @@ export function PreventativeMaintenance({
       </InfoAlert>
       <DestructiveButton onClick={onResetWarning}>Reset PM Due Warning</DestructiveButton>
 
-      <div className="flex items-center gap-[12px] mt-[18px] mb-[6px]">
-        <CalendarIcon className="text-btn-secondary-label" />
-        <span className="font-inter font-medium text-btn-secondary-label text-[24px] leading-none">
-          Next PM Date
-        </span>
-      </div>
-
-      <div className="flex flex-col items-stretch rounded-[6px] border border-btn-secondary-stroke overflow-hidden">
-        <StepperButton
-          direction="up"
-          onClick={() => onSetDays(Math.min(365, days + 1))}
-        />
-        <div className="bg-white py-[10px] text-center">
-          <p className="font-inter font-semibold text-btn-secondary-label text-[28px] leading-none">
-            {days} Days
-          </p>
-        </div>
-        <StepperButton
-          direction="down"
-          onClick={() => onSetDays(Math.max(1, days - 1))}
-        />
-      </div>
-
-      <p className="text-center font-inter font-medium text-btn-secondary-label text-[24px] leading-none mt-[2px]">
-        {formatted}
-      </p>
+      <PmDateStepper
+        days={days}
+        formatted={formatted}
+        onUp={() => onSetDays(Math.min(365, days + 1))}
+        onDown={() => onSetDays(Math.max(1, days - 1))}
+      />
 
       <div className="flex-1" />
 
@@ -288,26 +268,72 @@ export function PreventativeMaintenance({
   )
 }
 
+function PmDateStepper({
+  days,
+  formatted,
+  onUp,
+  onDown,
+}: {
+  days: number
+  formatted: string
+  onUp: () => void
+  onDown: () => void
+}) {
+  return (
+    <div className="flex flex-col gap-[12px] py-[8px]">
+      <div className="flex items-center gap-[16px] px-[16px]">
+        <CalendarIcon className="text-btn-secondary-label" />
+        <p className="flex-1 font-inter font-medium text-btn-secondary-label text-[28px] leading-normal tracking-[0.0066em]">
+          Next PM Date
+        </p>
+      </div>
+
+      <div className="w-full rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg p-[12px]">
+        <div className="flex flex-col items-center w-full">
+          <StepperButton direction="up" onClick={onUp} position="top" />
+          <div className="flex items-center justify-center gap-[11px] py-[12px] w-full">
+            <p className="font-inter font-medium text-btn-secondary-label text-[28px] leading-normal text-center tracking-[0.0066em]">
+              {days}
+            </p>
+            <p className="font-inter font-medium text-btn-secondary-label text-[28px] leading-normal text-center tracking-[0.0066em]">
+              Days
+            </p>
+          </div>
+          <StepperButton direction="down" onClick={onDown} position="bottom" />
+        </div>
+      </div>
+
+      <p className="font-inter font-medium text-btn-secondary-label text-[28px] leading-normal text-center tracking-[0.0066em] h-[34px]">
+        {formatted}
+      </p>
+    </div>
+  )
+}
+
 function StepperButton({
   direction,
   onClick,
+  position,
 }: {
   direction: 'up' | 'down'
   onClick: () => void
+  position: 'top' | 'bottom'
 }) {
+  const rounded =
+    position === 'top' ? 'rounded-t-[8px]' : 'rounded-b-[8px]'
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={direction === 'up' ? 'Increase' : 'Decrease'}
-      className="h-[44px] flex items-center justify-center bg-btn-secondary-bg active:bg-[#ebebeb] transition-colors"
-      style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.1)' }}
+      className={`h-[62px] w-full flex items-center justify-center bg-btn-secondary-bg border border-btn-secondary-stroke ${rounded} active:bg-[#ebebeb] transition-colors`}
+      style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }}
     >
       <span
         className="block text-btn-secondary-label"
         style={{
-          width: 28,
-          height: 28,
+          width: 30,
+          height: 30,
           transform: direction === 'up' ? 'rotate(-90deg)' : 'rotate(90deg)',
         }}
       >
