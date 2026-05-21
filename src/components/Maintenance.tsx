@@ -346,25 +346,69 @@ function StepperButton({
 type TaskScreenProps = CommonProps & {
   title: string
   options: string[]
-  onPick: (option: string) => void
+}
+
+type LoggedAction = {
+  kind: 'Repair' | 'Maintenance' | 'Part replacement'
+  at: Date
+}
+
+const labelForButton = (label: string): LoggedAction['kind'] => {
+  if (label === 'General Maintenance') return 'Maintenance'
+  if (label === 'Replace Part') return 'Part replacement'
+  // Anything starting with "Repair " (Repair Restraint / Leveler / Door)
+  return 'Repair'
 }
 
 export function MaintenanceTaskScreen({
   title,
   options,
-  onPick,
   onBack,
   onClose,
 }: TaskScreenProps) {
+  const [logged, setLogged] = useState<LoggedAction | null>(null)
   return (
     <MaintenancePanel title={title} onBack={onBack} onClose={onClose} gap={12}>
       <InfoAlert>Select the maintenance task that was completed:</InfoAlert>
       {options.map((label) => (
-        <AccentButton key={label} onClick={() => onPick(label)}>
+        <AccentButton
+          key={label}
+          onClick={() => setLogged({ kind: labelForButton(label), at: new Date() })}
+        >
           {label}
         </AccentButton>
       ))}
+      {logged && <LoggedConfirmation action={logged} />}
     </MaintenancePanel>
+  )
+}
+
+function LoggedConfirmation({ action }: { action: LoggedAction }) {
+  const d = action.at
+  const date = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
+  let h = d.getHours()
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12
+  if (h === 0) h = 12
+  const mm = d.getMinutes().toString().padStart(2, '0')
+  const time = `${h}:${mm} ${ampm}`
+  return (
+    <div
+      className="self-center flex flex-col items-center justify-center gap-[6px] rounded-[8px] border px-[24px] py-[12px]"
+      style={{ background: '#eafde3', borderColor: '#d4ebcc', color: '#1d5807' }}
+    >
+      <p className="font-inter font-medium text-[24px] leading-none text-center tracking-[0.0066em] whitespace-nowrap">
+        {action.kind} logged:
+      </p>
+      <div className="flex items-start gap-[10px]">
+        <p className="font-inter font-medium text-[24px] leading-none text-center tracking-[0.0066em] whitespace-nowrap">
+          {date}
+        </p>
+        <p className="font-inter font-medium text-[24px] leading-none text-center tracking-[0.0066em] whitespace-nowrap">
+          {time}
+        </p>
+      </div>
+    </div>
   )
 }
 

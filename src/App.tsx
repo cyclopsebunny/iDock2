@@ -147,7 +147,6 @@ export default function App() {
             <MaintenanceTaskScreen
               title="Restraint"
               options={['General Maintenance', 'Repair Restraint', 'Replace Part']}
-              onPick={() => setMenu('maintenance-entry')}
               onBack={() => setMenu('maintenance-entry')}
               onClose={() => setMenu('none')}
             />
@@ -156,7 +155,6 @@ export default function App() {
             <MaintenanceTaskScreen
               title="Leveler"
               options={['General Maintenance', 'Repair Leveler', 'Replace Part']}
-              onPick={() => setMenu('maintenance-entry')}
               onBack={() => setMenu('maintenance-entry')}
               onClose={() => setMenu('none')}
             />
@@ -165,7 +163,6 @@ export default function App() {
             <MaintenanceTaskScreen
               title="Door"
               options={['General Maintenance', 'Repair Door', 'Replace Part']}
-              onPick={() => setMenu('maintenance-entry')}
               onBack={() => setMenu('maintenance-entry')}
               onClose={() => setMenu('none')}
             />
