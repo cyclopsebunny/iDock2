@@ -125,6 +125,14 @@ export default function App() {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-4">
+        <DevControls
+          mode={mode}
+          setMode={setMode}
+          cameras={cameras}
+          setCamera={setCamera}
+          myqSubscribed={myqSubscribed}
+          setMyqSubscribed={setMyqSubscribed}
+        />
         <DeviceFrame>
           {mode === 'locked' && (
             <LockedScreen doorNumber={doorNumber} onTapToUnlock={() => setMode('pin')} />
@@ -432,14 +440,6 @@ export default function App() {
             />
           )}
         </DeviceFrame>
-        <DevControls
-          mode={mode}
-          setMode={setMode}
-          cameras={cameras}
-          setCamera={setCamera}
-          myqSubscribed={myqSubscribed}
-          setMyqSubscribed={setMyqSubscribed}
-        />
       </div>
     </div>
   )
