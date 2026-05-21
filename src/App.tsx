@@ -13,6 +13,7 @@ import {
 } from './components/DateTime'
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
+import { Timers } from './components/Timers'
 import {
   defaultMotionConfig,
   MotionConfig,
@@ -60,6 +61,7 @@ type Menu =
   | 'date-format'
   | 'local-datetime'
   | 'timezone'
+  | 'timers'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -215,6 +217,13 @@ export default function App() {
               onOpenLanguage={() => setMenu('language')}
               onOpenLightSound={() => setMenu('light-sound')}
               onOpenDateTime={() => setMenu('datetime')}
+              onOpenTimers={() => setMenu('timers')}
+            />
+          )}
+          {menu === 'timers' && mode === 'unlocked' && (
+            <Timers
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'datetime' && mode === 'unlocked' && (

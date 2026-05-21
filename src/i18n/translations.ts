@@ -154,6 +154,14 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Central Time Zone': 'Zona horaria central',
     'Eastern Time Zone': 'Zona horaria del Este',
     'Save Date Format': 'Guardar formato',
+
+    'Hook Raise Time': 'Tiempo de elevación del gancho',
+    'Hook Auto Store Extend Time': 'Tiempo de extensión auto del gancho',
+    'Hook Auto Raise Time': 'Tiempo de elevación auto del gancho',
+    'Below Dock Raise Time': 'Tiempo de elevación bajo muelle',
+    'Below Dock Lip Out Time': 'Tiempo de salida del labio bajo muelle',
+    'Chock Pullout Time': 'Tiempo de retiro del calzo',
+    'VS Bumpback Time': 'Tiempo de retroceso VS',
   },
   fr: {
     Locked: 'Verrouillé',
@@ -295,6 +303,14 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Central Time Zone': 'Fuseau horaire central',
     'Eastern Time Zone': 'Fuseau horaire de l’Est',
     'Save Date Format': 'Enregistrer le format',
+
+    'Hook Raise Time': 'Temps de levée du crochet',
+    'Hook Auto Store Extend Time': "Temps d'extension auto du crochet",
+    'Hook Auto Raise Time': 'Temps de levée auto du crochet',
+    'Below Dock Raise Time': 'Temps de levée sous quai',
+    'Below Dock Lip Out Time': 'Temps de sortie de lèvre sous quai',
+    'Chock Pullout Time': 'Temps de retrait de la cale',
+    'VS Bumpback Time': 'Temps de recul VS',
   },
 }
 
