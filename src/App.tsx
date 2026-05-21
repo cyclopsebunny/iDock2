@@ -3,6 +3,7 @@ import { CameraSettings } from './components/CameraSettings'
 import { CamerasMenu, CameraState } from './components/CamerasMenu'
 import { CameraStateConfig } from './components/CameraStateConfig'
 import { LanguageScreen } from './components/LanguageScreen'
+import { LightSound } from './components/LightSound'
 import {
   defaultMotionConfig,
   MotionConfig,
@@ -45,6 +46,7 @@ type Menu =
   | 'maintenance-leveler'
   | 'maintenance-door'
   | 'language'
+  | 'light-sound'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -188,10 +190,17 @@ export default function App() {
               onClose={() => setMenu('none')}
               onOpenIDockConfig={() => setMenu('idock-config')}
               onOpenLanguage={() => setMenu('language')}
+              onOpenLightSound={() => setMenu('light-sound')}
             />
           )}
           {menu === 'language' && mode === 'unlocked' && (
             <LanguageScreen
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'light-sound' && mode === 'unlocked' && (
+            <LightSound
               onBack={() => setMenu('settings')}
               onClose={() => setMenu('none')}
             />

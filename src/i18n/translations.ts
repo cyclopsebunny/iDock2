@@ -135,6 +135,12 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     English: 'English',
     Spanish: 'Spanish',
     French: 'French',
+
+    'Color Mode': 'Modo de color',
+    'Light Bar': 'Barra de luz',
+    'Outside Light': 'Luz exterior',
+    Sound: 'Sonido',
+    'Save Settings': 'Guardar ajustes',
   },
   fr: {
     Locked: 'Verrouillé',
@@ -257,6 +263,12 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     English: 'English',
     Spanish: 'Spanish',
     French: 'French',
+
+    'Color Mode': 'Mode couleur',
+    'Light Bar': 'Barre lumineuse',
+    'Outside Light': 'Éclairage extérieur',
+    Sound: 'Son',
+    'Save Settings': 'Enregistrer',
   },
 }
 

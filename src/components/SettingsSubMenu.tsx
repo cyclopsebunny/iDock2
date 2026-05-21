@@ -7,6 +7,7 @@ type Props = {
   onClose: () => void
   onOpenIDockConfig: () => void
   onOpenLanguage: () => void
+  onOpenLightSound: () => void
 }
 
 export function SettingsSubMenu({
@@ -14,6 +15,7 @@ export function SettingsSubMenu({
   onClose,
   onOpenIDockConfig,
   onOpenLanguage,
+  onOpenLightSound,
 }: Props) {
   const t = useT()
   return (
@@ -52,7 +54,7 @@ export function SettingsSubMenu({
           </button>
         </div>
         <MenuRow label={t('Language')} onClick={onOpenLanguage} />
-        <MenuRow label={t('Light & Sound')} />
+        <MenuRow label={t('Light & Sound')} onClick={onOpenLightSound} />
         <MenuRow label={t('Date & Time')} />
         <MenuRow label={t('PIN Code')} />
         <MenuRow label={t('Timers')} />
