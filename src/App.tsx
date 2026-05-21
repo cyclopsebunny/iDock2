@@ -13,7 +13,7 @@ import {
 } from './components/DateTime'
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
-import { Timers } from './components/Timers'
+import { TIMER_KEYS, TimerDetail, TimerKey, Timers } from './components/Timers'
 import {
   defaultMotionConfig,
   MotionConfig,
@@ -62,6 +62,7 @@ type Menu =
   | 'local-datetime'
   | 'timezone'
   | 'timers'
+  | 'timer-detail'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -85,6 +86,14 @@ export default function App() {
     meridiem: 'PM',
   })
   const [timeZone, setTimeZone] = useState<TimeZone>('Eastern Time Zone')
+  const [timerValues, setTimerValues] = useState<Record<TimerKey, number>>(
+    () =>
+      TIMER_KEYS.reduce<Record<TimerKey, number>>(
+        (acc, k) => ({ ...acc, [k]: 0 }),
+        {} as Record<TimerKey, number>,
+      ),
+  )
+  const [selectedTimer, setSelectedTimer] = useState<TimerKey>('Hook Raise Time')
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -223,6 +232,22 @@ export default function App() {
           {menu === 'timers' && mode === 'unlocked' && (
             <Timers
               onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
+              onOpenTimer={(key) => {
+                setSelectedTimer(key)
+                setMenu('timer-detail')
+              }}
+            />
+          )}
+          {menu === 'timer-detail' && mode === 'unlocked' && (
+            <TimerDetail
+              timerKey={selectedTimer}
+              value={timerValues[selectedTimer]}
+              onSave={(v) => {
+                setTimerValues((prev) => ({ ...prev, [selectedTimer]: v }))
+                setMenu('timers')
+              }}
+              onBack={() => setMenu('timers')}
               onClose={() => setMenu('none')}
             />
           )}
