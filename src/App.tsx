@@ -8,6 +8,7 @@ import {
   MotionDetectionConfig,
 } from './components/MotionDetectionConfig'
 import { DeviceFrame } from './components/DeviceFrame'
+import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
 import { SettingsMenu } from './components/SettingsMenu'
 import { SettingsSubMenu } from './components/SettingsSubMenu'
@@ -25,6 +26,7 @@ type Menu =
   | 'camera-settings'
   | 'camera-state'
   | 'motion-detection'
+  | 'equipment-info'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -73,10 +75,18 @@ export default function App() {
             <SettingsMenu
               onClose={() => setMenu('none')}
               onOpenSettings={() => setMenu('settings')}
+              onOpenEquipmentInfo={() => setMenu('equipment-info')}
               onLock={() => {
                 setMenu('none')
                 setMode('locked')
               }}
+            />
+          )}
+          {menu === 'equipment-info' && mode === 'unlocked' && (
+            <EquipmentInfo
+              doorNumber={doorNumber}
+              onBack={() => setMenu('main')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'settings' && mode === 'unlocked' && (

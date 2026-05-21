@@ -5,9 +5,15 @@ type Props = {
   onClose: () => void
   onLock: () => void
   onOpenSettings: () => void
+  onOpenEquipmentInfo: () => void
 }
 
-export function SettingsMenu({ onClose, onLock, onOpenSettings }: Props) {
+export function SettingsMenu({
+  onClose,
+  onLock,
+  onOpenSettings,
+  onOpenEquipmentInfo,
+}: Props) {
   return (
     <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
       <button
@@ -38,7 +44,7 @@ export function SettingsMenu({ onClose, onLock, onOpenSettings }: Props) {
           Lock iDock Controller
         </PrimaryButton>
         <PrimaryButton variant="destructive">Bypass Restrait</PrimaryButton>
-        <MenuRow label="Equipment Info" />
+        <MenuRow label="Equipment Info" onClick={onOpenEquipmentInfo} />
         <MenuRow label="Counters" />
         <MenuRow label="Maintenance" />
         <MenuRow label="Settings" onClick={onOpenSettings} />
