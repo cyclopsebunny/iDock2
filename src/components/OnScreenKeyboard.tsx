@@ -21,11 +21,7 @@ export function OnScreenKeyboard({ onKey, onBackspace, onEnter }: Props) {
       </Row>
       <Row pad>
         {ROW2.map((k) => (
-          <KeyBtn
-            key={k}
-            onClick={() => onKey(k)}
-            highlight={k === 'd'}
-          >
+          <KeyBtn key={k} onClick={() => onKey(k)}>
             {k}
           </KeyBtn>
         ))}
@@ -63,19 +59,15 @@ function Row({ children, pad }: { children: React.ReactNode; pad?: boolean }) {
 function KeyBtn({
   children,
   onClick,
-  highlight,
 }: {
   children: React.ReactNode
   onClick?: () => void
-  highlight?: boolean
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 h-[42px] rounded-[5px] flex items-center justify-center text-[20px] font-inter ${
-        highlight ? 'bg-accent-blue text-white' : 'bg-white text-[#3f4a55]'
-      }`}
+      className="flex-1 h-[42px] rounded-[5px] flex items-center justify-center text-[20px] font-inter bg-white text-[#3f4a55] active:bg-accent-blue active:text-white"
       style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.2)' }}
     >
       {children}
