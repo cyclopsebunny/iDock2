@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { BackArrowIcon, CloseIcon } from '../icons/Icons'
 import {
   Wifi1Icon,
   Wifi2Icon,
   Wifi3Icon,
   WifiFullIcon,
 } from '../icons/WifiSignalIcons'
+import { PagingFooter } from './PagingFooter'
 
 type Props = {
   onBack: () => void
@@ -151,55 +152,13 @@ export function Network({ onBack, onClose, onSelectNetwork, onOther }: Props) {
           {selected === null ? t('Select Other Network...') : t('Connect')}
         </button>
 
-        <div className="flex items-stretch -mx-[8px] -mb-[8px] border-t border-btn-secondary-stroke bg-white">
-          <PagingBtn
-            direction="up"
-            disabled={!canUp}
-            onClick={() => scrollRef.current?.scrollBy({ top: -160, behavior: 'smooth' })}
-          />
-          <PagingBtn
-            direction="down"
-            disabled={!canDown}
-            onClick={() => scrollRef.current?.scrollBy({ top: 160, behavior: 'smooth' })}
-          />
-        </div>
+        <PagingFooter
+          canUp={canUp}
+          canDown={canDown}
+          onUp={() => scrollRef.current?.scrollBy({ top: -160, behavior: 'smooth' })}
+          onDown={() => scrollRef.current?.scrollBy({ top: 160, behavior: 'smooth' })}
+        />
       </div>
     </div>
-  )
-}
-
-function PagingBtn({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: 'up' | 'down'
-  disabled: boolean
-  onClick: () => void
-}) {
-  const rounded = direction === 'up' ? 'rounded-l-[8px]' : 'rounded-r-[8px]'
-  const styles = disabled
-    ? 'bg-white border-[#eaeaea] text-[#a6a6a6] cursor-not-allowed'
-    : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label cursor-pointer active:bg-[#ebebeb]'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={direction === 'up' ? 'Scroll up' : 'Scroll down'}
-      className={`flex-1 h-[62px] m-[8px] flex items-center justify-center border ${rounded} ${styles}`}
-      style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }}
-    >
-      <span
-        className="block"
-        style={{
-          width: 22,
-          height: 22,
-          transform: direction === 'up' ? 'rotate(-90deg)' : 'rotate(90deg)',
-        }}
-      >
-        <ChevronRightIcon className="h-full w-full" />
-      </span>
-    </button>
   )
 }
