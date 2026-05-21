@@ -38,7 +38,7 @@ export function CameraStateConfig({
         className="relative flex flex-col gap-[10px] bg-white rounded-[12px] shadow-panel"
         style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
       >
-        <div className="flex h-[66px] items-center gap-[12px] px-[15px] shrink-0">
+        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
           <button
             type="button"
             aria-label="Back"
