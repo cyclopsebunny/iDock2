@@ -161,24 +161,28 @@ function IoStateRow({
   disabledLabel: string
 }) {
   return (
-    <div className="flex items-center gap-[8px] h-[64px] rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg pl-[8px] pr-0 overflow-hidden">
-      <div className="shrink-0 bg-brand-primary text-white rounded-[4px] flex items-center justify-center" style={{ width: 38, height: 48 }}>
+    <div
+      className="shrink-0 flex items-center gap-[8px] rounded-[6px] border border-btn-secondary-stroke bg-btn-secondary-bg pl-[8px] overflow-hidden"
+      style={{ height: 64 }}
+    >
+      <div
+        className="shrink-0 bg-brand-primary text-white rounded-[4px] flex items-center justify-center"
+        style={{ width: 38, height: 48 }}
+      >
         <span className="font-inter font-medium text-[28px] leading-none">{letter}</span>
       </div>
       <span className="flex-1 pl-[8px] font-inter font-medium text-btn-secondary-label text-[24px] leading-none tracking-[0.0066em]">
         {label}
       </span>
-      <span className="font-inter font-bold text-btn-secondary-label text-[20px] leading-none tracking-[0.0066em] whitespace-nowrap">
+      <span className="font-inter font-bold text-btn-secondary-label text-[20px] leading-none tracking-[0.0066em] whitespace-nowrap pr-[8px]">
         {enabled ? enabledLabel : disabledLabel}
       </span>
       <span
-        className="shrink-0 h-full"
+        className="shrink-0 self-stretch"
         style={{
           width: 13,
           background: enabled ? '#6ac449' : '#d13b0b',
-          boxShadow: enabled
-            ? 'inset 0 0 6px rgba(255,255,255,0.25)'
-            : 'inset 0 0 6px rgba(255,255,255,0.25)',
+          boxShadow: 'inset 0 0 6px rgba(255,255,255,0.25)',
         }}
       />
     </div>
