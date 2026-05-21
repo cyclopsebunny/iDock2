@@ -8,7 +8,12 @@ import {
   WifiFullIcon,
 } from '../icons/WifiSignalIcons'
 
-type Props = { onBack: () => void; onClose: () => void }
+type Props = {
+  onBack: () => void
+  onClose: () => void
+  onSelectNetwork: (name: string) => void
+  onOther: () => void
+}
 
 type Network = { name: string; strength: 1 | 2 | 3 | 4 }
 
@@ -34,7 +39,7 @@ function StrengthIcon({
   return <Wifi1Icon className={className} />
 }
 
-export function Network({ onBack, onClose }: Props) {
+export function Network({ onBack, onClose, onSelectNetwork, onOther }: Props) {
   const t = useT()
   const [selected, setSelected] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -137,6 +142,10 @@ export function Network({ onBack, onClose }: Props) {
 
         <button
           type="button"
+          onClick={() => {
+            if (selected === null) onOther()
+            else onSelectNetwork(NETWORKS[selected].name)
+          }}
           className="w-full rounded-[6px] border border-brand-primary bg-brand-primary text-white font-inter font-medium text-center text-[24px] tracking-[0.0066em] px-[12px] py-[14px] transition-opacity active:opacity-90"
         >
           {selected === null ? t('Select Other Network...') : t('Connect')}

@@ -14,6 +14,11 @@ import {
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
 import { Network } from './components/Network'
+import {
+  NetworkConnecting,
+  NetworkOther,
+  NetworkPassword,
+} from './components/NetworkFlow'
 import { TIMER_KEYS, TimerDetail, TimerKey, Timers } from './components/Timers'
 import {
   defaultMotionConfig,
@@ -65,6 +70,9 @@ type Menu =
   | 'timers'
   | 'timer-detail'
   | 'network'
+  | 'network-other'
+  | 'network-password'
+  | 'network-connecting'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -96,6 +104,7 @@ export default function App() {
       ),
   )
   const [selectedTimer, setSelectedTimer] = useState<TimerKey>('Hook Raise Time')
+  const [pendingNetworkSsid, setPendingNetworkSsid] = useState('')
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -236,6 +245,37 @@ export default function App() {
             <Network
               onBack={() => setMenu('settings')}
               onClose={() => setMenu('none')}
+              onOther={() => setMenu('network-other')}
+              onSelectNetwork={(name) => {
+                setPendingNetworkSsid(name)
+                setMenu('network-password')
+              }}
+            />
+          )}
+          {menu === 'network-other' && mode === 'unlocked' && (
+            <NetworkOther
+              onBack={() => setMenu('network')}
+              onClose={() => setMenu('none')}
+              onConnect={(ssid) => {
+                setPendingNetworkSsid(ssid)
+                setMenu('network-password')
+              }}
+            />
+          )}
+          {menu === 'network-password' && mode === 'unlocked' && (
+            <NetworkPassword
+              ssid={pendingNetworkSsid}
+              onBack={() => setMenu('network')}
+              onClose={() => setMenu('none')}
+              onConnect={() => setMenu('network-connecting')}
+            />
+          )}
+          {menu === 'network-connecting' && mode === 'unlocked' && (
+            <NetworkConnecting
+              ssid={pendingNetworkSsid}
+              onBack={() => setMenu('network')}
+              onClose={() => setMenu('none')}
+              onContinue={() => setMenu('settings')}
             />
           )}
           {menu === 'timers' && mode === 'unlocked' && (
