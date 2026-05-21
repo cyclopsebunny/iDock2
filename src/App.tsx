@@ -2,6 +2,15 @@ import { useState } from 'react'
 import { CameraSettings } from './components/CameraSettings'
 import { CamerasMenu, CameraState } from './components/CamerasMenu'
 import { CameraStateConfig } from './components/CameraStateConfig'
+import {
+  DateFormat,
+  DateFormatScreen,
+  DateTimeMenu,
+  LocalDateTime,
+  LocalDateTimeScreen,
+  TimeZone,
+  TimeZoneScreen,
+} from './components/DateTime'
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
 import {
@@ -47,6 +56,10 @@ type Menu =
   | 'maintenance-door'
   | 'language'
   | 'light-sound'
+  | 'datetime'
+  | 'date-format'
+  | 'local-datetime'
+  | 'timezone'
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('locked')
@@ -60,6 +73,16 @@ export default function App() {
   const [myqSubscribed, setMyqSubscribed] = useState(true)
   const [pmDays, setPmDays] = useState(60)
   const [nextPmDate, setNextPmDate] = useState('6/1/2024')
+  const [dateFormat, setDateFormat] = useState<DateFormat>('MM/DD/YYYY')
+  const [localDateTime, setLocalDateTime] = useState<LocalDateTime>({
+    month: 8,
+    day: 2,
+    year: 2024,
+    hour: 5,
+    minute: 0,
+    meridiem: 'PM',
+  })
+  const [timeZone, setTimeZone] = useState<TimeZone>('Eastern Time Zone')
   const [selectedCamera, setSelectedCamera] = useState<number>(1)
   const doorNumber = '01'
 
@@ -191,6 +214,52 @@ export default function App() {
               onOpenIDockConfig={() => setMenu('idock-config')}
               onOpenLanguage={() => setMenu('language')}
               onOpenLightSound={() => setMenu('light-sound')}
+              onOpenDateTime={() => setMenu('datetime')}
+            />
+          )}
+          {menu === 'datetime' && mode === 'unlocked' && (
+            <DateTimeMenu
+              dateFormat={dateFormat}
+              localDateTime={localDateTime}
+              timeZone={timeZone}
+              onBack={() => setMenu('settings')}
+              onClose={() => setMenu('none')}
+              onOpenDateFormat={() => setMenu('date-format')}
+              onOpenLocalDateTime={() => setMenu('local-datetime')}
+              onOpenTimeZone={() => setMenu('timezone')}
+            />
+          )}
+          {menu === 'date-format' && mode === 'unlocked' && (
+            <DateFormatScreen
+              value={dateFormat}
+              onSave={(v) => {
+                setDateFormat(v)
+                setMenu('datetime')
+              }}
+              onBack={() => setMenu('datetime')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'local-datetime' && mode === 'unlocked' && (
+            <LocalDateTimeScreen
+              value={localDateTime}
+              onSave={(v) => {
+                setLocalDateTime(v)
+                setMenu('datetime')
+              }}
+              onBack={() => setMenu('datetime')}
+              onClose={() => setMenu('none')}
+            />
+          )}
+          {menu === 'timezone' && mode === 'unlocked' && (
+            <TimeZoneScreen
+              value={timeZone}
+              onSave={(v) => {
+                setTimeZone(v)
+                setMenu('datetime')
+              }}
+              onBack={() => setMenu('datetime')}
+              onClose={() => setMenu('none')}
             />
           )}
           {menu === 'language' && mode === 'unlocked' && (
