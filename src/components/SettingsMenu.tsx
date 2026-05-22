@@ -5,6 +5,7 @@ import { MenuRow } from './MenuRow'
 type Props = {
   onClose: () => void
   onLock: () => void
+  onBypassRestraint: () => void
   onOpenSettings: () => void
   onOpenEquipmentInfo: () => void
   onOpenCounters: () => void
@@ -14,6 +15,7 @@ type Props = {
 export function SettingsMenu({
   onClose,
   onLock,
+  onBypassRestraint,
   onOpenSettings,
   onOpenEquipmentInfo,
   onOpenCounters,
@@ -49,7 +51,9 @@ export function SettingsMenu({
         <PrimaryButton variant="accent" onClick={onLock}>
           {t('Lock iDock Controller')}
         </PrimaryButton>
-        <PrimaryButton variant="destructive">{t('Bypass Restrait')}</PrimaryButton>
+        <PrimaryButton variant="destructive" onClick={onBypassRestraint}>
+          {t('Bypass Restrait')}
+        </PrimaryButton>
         <MenuRow label={t('Equipment Info')} onClick={onOpenEquipmentInfo} />
         <MenuRow label={t('Counters')} onClick={onOpenCounters} />
         <MenuRow label={t('Maintenance')} onClick={onOpenMaintenance} />

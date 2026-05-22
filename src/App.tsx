@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CameraSettings } from './components/CameraSettings'
 import { CamerasMenu, CameraState } from './components/CamerasMenu'
 import { CameraStateConfig } from './components/CameraStateConfig'
@@ -14,6 +14,7 @@ import {
 import { LanguageScreen } from './components/LanguageScreen'
 import { LightSound } from './components/LightSound'
 import { Network } from './components/Network'
+import { PhysicalControls } from './components/PhysicalControls'
 import {
   NetworkConnecting,
   NetworkOther,
@@ -43,6 +44,11 @@ import { SettingsSubMenu } from './components/SettingsSubMenu'
 import { LockedScreen } from './screens/LockedScreen'
 import { PinScreen } from './screens/PinScreen'
 import { UnlockedScreen } from './screens/UnlockedScreen'
+import { RestraintOfflineScreen } from './screens/RestraintOfflineScreen'
+import { AuthorizationWaitScreen } from './screens/AuthorizationWaitScreen'
+import { BypassPinScreen } from './screens/BypassPinScreen'
+import { DoorAnimationScreen } from './screens/DoorAnimationScreen'
+import { LevelerAnimationScreen } from './screens/LevelerAnimationScreen'
 
 type Mode = 'locked' | 'pin' | 'unlocked'
 type Menu =
@@ -88,6 +94,141 @@ export default function App() {
     defaultMotionConfig(),
   ])
   const [myqSubscribed, setMyqSubscribed] = useState(true)
+  const [trailerPresent, setTrailerPresentRaw] = useState(false)
+  const [restraintOnline, setRestraintOnline] = useState(true)
+  const [bypassStep, setBypassStep] = useState<'none' | 'wait' | 'pin'>('none')
+  /** True once the user has successfully engaged (or bypassed) the restraint. */
+  const [restraintEngaged, setRestraintEngaged] = useState(false)
+  /**
+   * True if the restraint was authorized via the PIN bypass flow rather than
+   * engaged normally. The dock workflow continues with a yellow/alert theme
+   * to make the bypass state obvious to the user.
+   */
+  const [restraintBypassed, setRestraintBypassed] = useState(false)
+  /**
+   * Set true when the user presses the Restraint Engage physical button and
+   * the restraint hardware is offline. Drives the "Cannot engage restraint"
+   * screen. Cleared when the user cancels the bypass request.
+   */
+  const [engageFailed, setEngageFailed] = useState(false)
+  /**
+   * Door workflow:
+   *   closed → opening (5s animation) → open → closing (5s animation) → closed
+   */
+  const [doorState, setDoorState] = useState<
+    'closed' | 'opening' | 'open' | 'closing'
+  >('closed')
+  /**
+   * Transient warning shown when the user presses Door Open before engaging
+   * the restraint. Auto-clears after 8s or as soon as Restraint Engage is
+   * pressed (success or failure).
+   */
+  const [engageFirstWarning, setEngageFirstWarning] = useState(false)
+  /**
+   * Leveler workflow:
+   *   stored → deploying (5s press-and-hold) → deployed
+   *   deployed → storing (5s press-and-hold) → stored-after-use
+   * Releasing during 'deploying' returns to 'stored'.
+   * Releasing during 'storing' returns to 'deployed'.
+   * The terminal 'stored-after-use' state shows the Leveler Stored screen
+   * with the Close Door prompt (distinct from the initial 'stored' which
+   * shows the Door Open / Operate Leveler screen).
+   */
+  const [levelerState, setLevelerState] = useState<
+    'stored' | 'deploying' | 'deployed' | 'storing' | 'stored-after-use'
+  >('stored')
+  // Remembers which state to revert to when the user releases mid-animation.
+  const [levelerPriorState, setLevelerPriorState] = useState<
+    'stored' | 'stored-after-use' | 'deployed'
+  >('stored')
+
+  // Auto-dismiss the engage-first warning after 8 seconds.
+  useEffect(() => {
+    if (!engageFirstWarning) return
+    const id = setTimeout(() => setEngageFirstWarning(false), 8000)
+    return () => clearTimeout(id)
+  }, [engageFirstWarning])
+
+  // Leveler operations are press-and-hold for 5 seconds. Same logic for
+  // both directions — releasing early reverts to the previous state via the
+  // release handler, which cleans up this effect.
+  useEffect(() => {
+    if (levelerState === 'deploying') {
+      const id = setTimeout(() => setLevelerState('deployed'), 5000)
+      return () => clearTimeout(id)
+    }
+    if (levelerState === 'storing') {
+      const id = setTimeout(() => setLevelerState('stored-after-use'), 5000)
+      return () => clearTimeout(id)
+    }
+  }, [levelerState])
+
+  // Wrap setTrailerPresent so the dock workflow resets when the truck leaves.
+  const setTrailerPresent = (v: boolean) => {
+    setTrailerPresentRaw(v)
+    if (!v) {
+      setRestraintEngaged(false)
+      setEngageFailed(false)
+      setBypassStep('none')
+      setDoorState('closed')
+      setEngageFirstWarning(false)
+      setLevelerState('stored')
+      setRestraintBypassed(false)
+    }
+  }
+
+  /**
+   * Press-and-hold handlers for the physical Leveler Lower button.
+   * - Press starts the 5s deployment (only valid when door is open).
+   * - Release before 5s cancels back to 'stored'.
+   * - After 5s the useEffect transitions to 'deployed' — releasing the
+   *   button at that point is a no-op.
+   */
+  const handleLevelerPress = () => {
+    if (!trailerPresent || !restraintEngaged || doorState !== 'open') return
+    if (levelerState === 'stored' || levelerState === 'stored-after-use') {
+      // Either a fresh deploy, or a re-deploy after the user already
+      // stored — both transition into the deploying animation and end up
+      // at Leveler Deployed (session in progress).
+      setLevelerPriorState(levelerState)
+      setLevelerState('deploying')
+    } else if (levelerState === 'deployed') {
+      setLevelerPriorState('deployed')
+      setLevelerState('storing')
+    }
+  }
+  const handleLevelerRelease = () => {
+    if (levelerState === 'deploying') {
+      // Cancel mid-deploy → return to the prior stored state.
+      setLevelerState(levelerPriorState === 'deployed' ? 'stored' : levelerPriorState)
+    }
+    if (levelerState === 'storing') setLevelerState('deployed')
+  }
+
+  /** Called by the physical Door Open button. */
+  const handleDoorOpen = () => {
+    if (!trailerPresent) return
+    if (!restraintEngaged) {
+      // User skipped the engage step — show the 8s warning. Pressing this
+      // again while the warning is up just resets the 8s timer.
+      setEngageFirstWarning(true)
+      return
+    }
+    if (doorState === 'closed') setDoorState('opening')
+  }
+
+  /** Called by the physical Restraint Engage button. */
+  const handleEngageRestraint = () => {
+    // Pressing engage always dismisses the engage-first warning.
+    setEngageFirstWarning(false)
+    if (!trailerPresent || restraintEngaged) return
+    if (restraintOnline) {
+      setRestraintEngaged(true)
+      setEngageFailed(false)
+    } else {
+      setEngageFailed(true)
+    }
+  }
   const [pmDays, setPmDays] = useState(60)
   const [nextPmDate, setNextPmDate] = useState('6/1/2024')
   const [dateFormat, setDateFormat] = useState<DateFormat>('MM/DD/YYYY')
@@ -124,16 +265,29 @@ export default function App() {
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <DevControls
-          mode={mode}
-          setMode={setMode}
-          cameras={cameras}
-          setCamera={setCamera}
-          myqSubscribed={myqSubscribed}
-          setMyqSubscribed={setMyqSubscribed}
-        />
-        <DeviceFrame>
+      <div className="flex items-start gap-6">
+        {/* Left stack: the device frame with the physical button panel
+            centered under it. */}
+        <div className="flex flex-col items-center gap-4">
+        <DeviceFrame
+          theme={
+            // Bypass session — yellow theme as long as the dock is in
+            // bypass mode (i.e. PIN-authorized restraint engagement).
+            mode === 'unlocked' &&
+            trailerPresent &&
+            restraintEngaged &&
+            restraintBypassed
+              ? 'bypass'
+              : mode === 'unlocked' && trailerPresent && restraintEngaged
+                ? 'positive' // engaged / opening / door open
+                : mode === 'unlocked' &&
+                    trailerPresent &&
+                    engageFailed &&
+                    bypassStep !== 'none'
+                  ? 'bypass'
+                  : 'red'
+          }
+        >
           {mode === 'locked' && (
             <LockedScreen doorNumber={doorNumber} onTapToUnlock={() => setMode('pin')} />
           )}
@@ -143,13 +297,259 @@ export default function App() {
               onSubmit={() => setMode('unlocked')}
             />
           )}
-          {mode === 'unlocked' && (
-            <UnlockedScreen
-              doorNumber={doorNumber}
-              status="No Truck at Dock"
-              onOpenSettings={() => setMenu('main')}
-            />
-          )}
+          {mode === 'unlocked' &&
+            (() => {
+              // "Engage the restraint before opening the door" warning — fires
+              // when Door Open is pressed before the restraint is engaged.
+              if (
+                trailerPresent &&
+                !restraintEngaged &&
+                engageFirstWarning &&
+                bypassStep === 'none' &&
+                !engageFailed
+              ) {
+                return (
+                  <RestraintOfflineScreen
+                    doorNumber={doorNumber}
+                    topGraphic="stop"
+                    message="Engage the restraint before opening the door"
+                    onOpenSettings={() => setMenu('main')}
+                    onBypassRestraint={() => {
+                      // Skipping straight to the bypass flow from the warning.
+                      setEngageFirstWarning(false)
+                      setEngageFailed(true)
+                      setBypassStep('wait')
+                    }}
+                  />
+                )
+              }
+              // Bypass flow only shows up after an explicit engage attempt
+              // failed (engageFailed) — not just because the hardware is
+              // offline.
+              if (trailerPresent && engageFailed) {
+                if (bypassStep === 'pin') {
+                  return (
+                    <BypassPinScreen
+                      onCancel={() => setBypassStep('wait')}
+                      onSubmit={() => {
+                        // Successful bypass → restraint is now considered
+                        // engaged, but flagged as bypassed so downstream
+                        // screens use the yellow alert theme.
+                        setBypassStep('none')
+                        setEngageFailed(false)
+                        setRestraintEngaged(true)
+                        setRestraintBypassed(true)
+                      }}
+                    />
+                  )
+                }
+                if (bypassStep === 'wait') {
+                  return (
+                    <AuthorizationWaitScreen
+                      doorNumber={doorNumber}
+                      onOpenSettings={() => setMenu('main')}
+                      onCancelRequest={() => {
+                        // Cancelling clears the failed-engage state so the
+                        // user returns to the Truck at Dock prompt.
+                        setBypassStep('none')
+                        setEngageFailed(false)
+                      }}
+                      onEnterPin={() => setBypassStep('pin')}
+                    />
+                  )
+                }
+                return (
+                  <RestraintOfflineScreen
+                    doorNumber={doorNumber}
+                    onOpenSettings={() => setMenu('main')}
+                    onBypassRestraint={() => setBypassStep('wait')}
+                  />
+                )
+              }
+
+              if (trailerPresent && restraintEngaged) {
+                // Convenience derivatives used by every session sub-screen.
+                const bypass = restraintBypassed
+                const promptTone: 'success' | 'alert' = bypass
+                  ? 'alert'
+                  : 'success'
+                const subtitle = bypass ? 'Restraint in Bypass' : undefined
+                if (doorState === 'opening' || doorState === 'closing') {
+                  return (
+                    <DoorAnimationScreen
+                      doorNumber={doorNumber}
+                      direction={
+                        doorState === 'opening' ? 'opening' : 'closing'
+                      }
+                      onOpenSettings={() => setMenu('main')}
+                      onComplete={() => {
+                        if (doorState === 'opening') {
+                          setDoorState('open')
+                          return
+                        }
+                        // Closing finished. In bypass mode, completing a
+                        // full deploy → store → close cycle ends the
+                        // bypass session: return to Truck at Dock (red)
+                        // instead of looping back to Restraint Bypassed.
+                        if (
+                          restraintBypassed &&
+                          levelerState === 'stored-after-use'
+                        ) {
+                          setRestraintEngaged(false)
+                          setRestraintBypassed(false)
+                          setLevelerState('stored')
+                          setDoorState('closed')
+                          return
+                        }
+                        setDoorState('closed')
+                      }}
+                      bypass={bypass}
+                    />
+                  )
+                }
+                if (doorState === 'open') {
+                  if (
+                    levelerState === 'deploying' ||
+                    levelerState === 'storing'
+                  ) {
+                    return (
+                      <LevelerAnimationScreen
+                        direction={
+                          levelerState === 'deploying' ? 'deploy' : 'store'
+                        }
+                        onOpenSettings={() => setMenu('main')}
+                        bypass={bypass}
+                      />
+                    )
+                  }
+                  if (levelerState === 'deployed') {
+                    return (
+                      <UnlockedScreen
+                        doorNumber={doorNumber}
+                        status="Leveler Deployed."
+                        topGraphic={bypass ? 'forklift-dark' : 'forklift'}
+                        topSubtitle={subtitle}
+                        showDoorNumber={false}
+                        prompt={{
+                          icon: 'leveler-store-icon.svg',
+                          label: 'Store Leveler\nwhen complete',
+                          tone: promptTone,
+                        }}
+                        onOpenSettings={() => setMenu('main')}
+                      />
+                    )
+                  }
+                  if (levelerState === 'stored-after-use') {
+                    return (
+                      <UnlockedScreen
+                        doorNumber={doorNumber}
+                        status="Leveler Stored"
+                        topGraphic={
+                          bypass ? 'dock-doors-close-dark' : 'dock-doors-close'
+                        }
+                        topSubtitle={subtitle}
+                        showDoorNumber={false}
+                        prompt={{
+                          icon: 'close-door-icon.svg',
+                          label: 'Close Door',
+                          tone: promptTone,
+                        }}
+                        onOpenSettings={() => setMenu('main')}
+                      />
+                    )
+                  }
+                  return (
+                    <UnlockedScreen
+                      doorNumber={doorNumber}
+                      status="Door Open. Operate Leveler"
+                      topGraphic={
+                        bypass ? 'leveler-arrow-dark' : 'leveler-arrow'
+                      }
+                      topSubtitle={subtitle}
+                      showDoorNumber={false}
+                      prompt={{
+                        icon: 'leveler-icon.svg',
+                        label: 'Deploy Leveler',
+                        tone: promptTone,
+                      }}
+                      onOpenSettings={() => setMenu('main')}
+                    />
+                  )
+                }
+                // Door closed and leveler already used → session complete.
+                // In bypass mode there's no restraint to release, so we
+                // skip the Door Closed / Release Restraint screen entirely
+                // and loop the user back to the Restraint Bypassed screen
+                // (Open Door prompt). The session ends when the trailer
+                // leaves the sensor.
+                if (levelerState === 'stored-after-use' && !bypass) {
+                  return (
+                    <UnlockedScreen
+                      doorNumber={doorNumber}
+                      status="Door Closed"
+                      topGraphic="lock"
+                      showDoorNumber={false}
+                      prompt={{
+                        icon: 'restraint-release-icon.svg',
+                        label: 'Release Restraint',
+                        tone: 'success',
+                      }}
+                      onOpenSettings={() => setMenu('main')}
+                    />
+                  )
+                }
+                // PIN-authorized bypass → yellow Restraint Bypassed screen.
+                if (restraintBypassed) {
+                  return (
+                    <UnlockedScreen
+                      doorNumber={doorNumber}
+                      status="Restraint Bypassed"
+                      topGraphic="dock-doors-dark"
+                      topSubtitle="Restraint in Bypass"
+                      topSubtitleColor="#513500"
+                      showDoorNumber={false}
+                      prompt={{
+                        icon: 'door-open-icon.svg',
+                        label: 'Open Door',
+                        tone: 'alert',
+                      }}
+                      onOpenSettings={() => setMenu('main')}
+                    />
+                  )
+                }
+                return (
+                  <UnlockedScreen
+                    doorNumber={doorNumber}
+                    status="Restraint Engaged"
+                    topGraphic="dock-doors"
+                    showDoorNumber={false}
+                    prompt={{
+                      icon: 'door-open-icon.svg',
+                      label: 'Open Door',
+                      tone: 'success',
+                    }}
+                    onOpenSettings={() => setMenu('main')}
+                  />
+                )
+              }
+
+              return (
+                <UnlockedScreen
+                  doorNumber={doorNumber}
+                  status={trailerPresent ? 'Truck at Dock' : 'No Truck at Dock'}
+                  prompt={
+                    trailerPresent
+                      ? {
+                          icon: 'restraint-icon.svg',
+                          label: 'Engage Restraint',
+                          tone: 'warning',
+                        }
+                      : null
+                  }
+                  onOpenSettings={() => setMenu('main')}
+                />
+              )
+            })()}
           {menu === 'main' && mode === 'unlocked' && (
             <SettingsMenu
               onClose={() => setMenu('none')}
@@ -160,6 +560,15 @@ export default function App() {
               onLock={() => {
                 setMenu('none')
                 setMode('locked')
+              }}
+              onBypassRestraint={() => {
+                // Enter the bypass authorization flow from the main menu.
+                // Same destination as the "Bypass Restrait" button on the
+                // Cannot Engage Restraint screen: yellow Authorization
+                // Requested... screen, with Enter PIN Code to proceed.
+                setMenu('none')
+                setEngageFailed(true)
+                setBypassStep('wait')
               }}
             />
           )}
@@ -440,91 +849,176 @@ export default function App() {
             />
           )}
         </DeviceFrame>
+        <PhysicalControls
+          onEngageRestraint={handleEngageRestraint}
+          onReleaseRestraint={() => {
+            // Release ends the dock session: restraint disengages, door
+            // closes, leveler returns to the initial stored state. The user
+            // is back at "Truck at Dock" with the Engage Restraint prompt.
+            setRestraintEngaged(false)
+            setRestraintBypassed(false)
+            setDoorState('closed')
+            setLevelerState('stored')
+          }}
+          onDoorOpen={handleDoorOpen}
+          onDoorClose={() => {
+            if (doorState === 'open') setDoorState('closing')
+          }}
+          onDoorStop={() => {
+            // TODO: stop the in-progress open/close.
+          }}
+          onLevelerPressDown={handleLevelerPress}
+          onLevelerPressUp={handleLevelerRelease}
+          levelerStored={
+            levelerState === 'stored' || levelerState === 'stored-after-use'
+          }
+        />
+        </div>
+        {/* Right column: all dev/simulation controls. */}
+        <DevControls
+          trailerPresent={trailerPresent}
+          setTrailerPresent={setTrailerPresent}
+          restraintOnline={restraintOnline}
+          setRestraintOnline={setRestraintOnline}
+          cameras={cameras}
+          setCamera={setCamera}
+          myqSubscribed={myqSubscribed}
+          setMyqSubscribed={setMyqSubscribed}
+        />
       </div>
     </div>
   )
 }
 
 type DevControlsProps = {
-  mode: Mode
-  setMode: (m: Mode) => void
+  trailerPresent: boolean
+  setTrailerPresent: (v: boolean) => void
+  restraintOnline: boolean
+  setRestraintOnline: (v: boolean) => void
   cameras: CameraState[]
   setCamera: (idx: number, state: CameraState) => void
   myqSubscribed: boolean
   setMyqSubscribed: (v: boolean) => void
 }
 
+function DevSectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[11px] uppercase tracking-wider text-white/40 px-1">
+      {children}
+    </div>
+  )
+}
+
 function DevControls({
-  mode,
-  setMode,
+  trailerPresent,
+  setTrailerPresent,
+  restraintOnline,
+  setRestraintOnline,
   cameras,
   setCamera,
   myqSubscribed,
   setMyqSubscribed,
 }: DevControlsProps) {
   return (
-    <div className="flex flex-col items-center gap-3 text-xs text-white/60 font-inter">
-      <div className="flex gap-2">
-        {(['locked', 'pin', 'unlocked'] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`px-2 py-1 rounded border ${
-              mode === m ? 'border-white/60 text-white' : 'border-white/20 hover:border-white/40'
-            }`}
-          >
-            {m}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-col gap-2">
-        {cameras.map((state, idx) => (
+    <div className="flex flex-col gap-4 font-inter text-xs text-white/70 w-[220px]">
+      <section className="flex flex-col gap-2">
+        <DevSectionTitle>Simulated Sensors</DevSectionTitle>
+        <button
+          type="button"
+          onClick={() => setTrailerPresent(!trailerPresent)}
+          className={`flex flex-col items-start gap-1 px-3 py-2 rounded border text-left ${
+            trailerPresent
+              ? 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10'
+              : 'border-white/20 text-white/60 hover:border-white/40'
+          }`}
+        >
+          <div className="flex items-center gap-2 text-sm">
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${
+                trailerPresent ? 'bg-emerald-400' : 'bg-white/30'
+              }`}
+            />
+            Trailer Present
+          </div>
+          <span className="opacity-70 text-[11px]">
+            {trailerPresent ? 'Tripped — truck at dock' : 'Click to trip sensor'}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setRestraintOnline(!restraintOnline)}
+          className={`flex flex-col items-start gap-1 px-3 py-2 rounded border text-left ${
+            restraintOnline
+              ? 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10'
+              : 'border-amber-500/60 text-amber-300 bg-amber-500/10'
+          }`}
+        >
+          <div className="flex items-center gap-2 text-sm">
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${
+                restraintOnline ? 'bg-emerald-400' : 'bg-amber-400'
+              }`}
+            />
+            {restraintOnline ? 'Restraint Online' : 'Restraint Offline'}
+          </div>
+          <span className="opacity-70 text-[11px]">
+            {restraintOnline
+              ? 'Hardware reachable'
+              : 'Cannot engage — bypass required'}
+          </span>
+        </button>
+      </section>
+
+      {cameras.map((state, idx) => (
+        <section key={idx} className="flex flex-col gap-2">
+          <DevSectionTitle>Camera {idx + 1}</DevSectionTitle>
           <CameraControl
-            key={idx}
-            label={`Camera ${idx + 1}`}
             state={state}
             onChange={(s) => setCamera(idx, s)}
           />
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={() => setMyqSubscribed(!myqSubscribed)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded border ${
-          myqSubscribed
-            ? 'border-emerald-500/60 text-emerald-300'
-            : 'border-amber-500/60 text-amber-300'
-        }`}
-      >
-        <span
-          className={`inline-block h-2 w-2 rounded-full ${
-            myqSubscribed ? 'bg-emerald-400' : 'bg-amber-400'
+        </section>
+      ))}
+
+      <section className="flex flex-col gap-2">
+        <DevSectionTitle>myQ Subscription</DevSectionTitle>
+        <button
+          type="button"
+          onClick={() => setMyqSubscribed(!myqSubscribed)}
+          className={`flex flex-col items-start gap-1 px-3 py-2 rounded border text-left ${
+            myqSubscribed
+              ? 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10'
+              : 'border-amber-500/60 text-amber-300 bg-amber-500/10'
           }`}
-        />
-        myQ subscription: {myqSubscribed ? 'Active' : 'Inactive'}
-        <span className="opacity-60">— click to toggle</span>
-      </button>
+        >
+          <div className="flex items-center gap-2 text-sm">
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${
+                myqSubscribed ? 'bg-emerald-400' : 'bg-amber-400'
+              }`}
+            />
+            {myqSubscribed ? 'Active' : 'Inactive'}
+          </div>
+          <span className="opacity-70 text-[11px]">Click to toggle</span>
+        </button>
+      </section>
     </div>
   )
 }
 
 function CameraControl({
-  label,
   state,
   onChange,
 }: {
-  label: string
   state: CameraState
   onChange: (s: CameraState) => void
 }) {
   const opts: { value: CameraState; label: string; tone: string }[] = [
-    { value: 'connected', label: 'Connected', tone: 'border-emerald-500/60 text-emerald-300' },
-    { value: 'disconnected', label: 'Disconnected', tone: 'border-rose-500/60 text-rose-300' },
-    { value: 'never', label: 'Remove', tone: 'border-white/40 text-white/70' },
+    { value: 'connected', label: 'Connected', tone: 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10' },
+    { value: 'disconnected', label: 'Disconnected', tone: 'border-rose-500/60 text-rose-300 bg-rose-500/10' },
+    { value: 'never', label: 'Remove', tone: 'border-white/40 text-white/70 bg-white/5' },
   ]
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-[72px] text-white/80">{label}:</span>
+    <div className="flex gap-1">
       {opts.map((o) => {
         const active = state === o.value
         return (
@@ -532,7 +1026,7 @@ function CameraControl({
             key={o.value}
             type="button"
             onClick={() => onChange(o.value)}
-            className={`px-2 py-1 rounded border ${
+            className={`flex-1 px-2 py-1.5 rounded border text-[11px] ${
               active ? o.tone : 'border-white/15 text-white/50 hover:border-white/30'
             }`}
           >
