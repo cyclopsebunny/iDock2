@@ -4,6 +4,7 @@ import { CalendarIcon } from '../icons/EquipmentIcons'
 import { ChevronRightIcon } from '../icons/Icons'
 import { MenuModal } from './MenuModal'
 import { MenuRow } from './MenuRow'
+import { PagingFooter } from './PagingFooter'
 
 type CommonProps = {
   onBack: () => void
@@ -189,7 +190,7 @@ export function MaintenanceRecords({ onBack, onClose }: CommonProps) {
           </button>
         ))}
       </div>
-      <PagingButtons
+      <PagingFooter
         canUp={canUp}
         canDown={canDown}
         onUp={() => scrollRef.current?.scrollBy({ top: -220, behavior: 'smooth' })}
@@ -405,60 +406,3 @@ function LoggedConfirmation({ action }: { action: LoggedAction }) {
   )
 }
 
-function PagingButtons({
-  canUp,
-  canDown,
-  onUp,
-  onDown,
-}: {
-  canUp: boolean
-  canDown: boolean
-  onUp: () => void
-  onDown: () => void
-}) {
-  return (
-    <div
-      className="shrink-0 flex items-stretch border-t border-btn-secondary-stroke bg-white px-[8px] pt-[16px] pb-[8px] -mx-[8px] -mb-[8px]"
-      style={{ boxShadow: '0 -4px 6px rgba(0,0,0,0.25)' }}
-    >
-      <PagingButton direction="up" disabled={!canUp} onClick={onUp} />
-      <PagingButton direction="down" disabled={!canDown} onClick={onDown} />
-    </div>
-  )
-}
-
-function PagingButton({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: 'up' | 'down'
-  disabled: boolean
-  onClick: () => void
-}) {
-  const rounded = direction === 'up' ? 'rounded-l-[8px]' : 'rounded-r-[8px]'
-  const baseStyles = disabled
-    ? 'bg-white border-[#eaeaea] text-[#a6a6a6] cursor-not-allowed'
-    : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label cursor-pointer active:bg-[#ebebeb]'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={direction === 'up' ? 'Scroll up' : 'Scroll down'}
-      className={`flex-1 h-[62px] flex items-center justify-center border ${rounded} ${baseStyles}`}
-      style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }}
-    >
-      <span
-        className="block"
-        style={{
-          width: 30,
-          height: 30,
-          transform: direction === 'up' ? 'rotate(-90deg)' : 'rotate(90deg)',
-        }}
-      >
-        <ChevronRightIcon className="h-full w-full" />
-      </span>
-    </button>
-  )
-}

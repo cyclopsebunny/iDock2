@@ -9,17 +9,35 @@ type Props = {
 
 /**
  * The bottom-of-panel "scroll up / scroll down" pager used on screens whose
- * content is taller than the panel. Matches the Equipment Info design.
+ * content is taller than the panel.
  *
- * Place this as a sibling of a scrollable flex-1 region inside a panel with
- * `padding: 8`. It bleeds into that 8px padding via negative margins so the
- * top border and drop shadow sit flush with the panel edge.
+ * Place this as a sibling of a scrollable `flex-1` region inside a
+ * `<MenuModal>` (which already has `padding: 8`). The footer bleeds into
+ * that 8px padding via negative margins so it sits flush with the panel
+ * edges, and rounds its bottom corners to match the panel's `rounded-12`
+ * bottom.
+ *
+ * The container background is a transparent → white gradient so content
+ * scrolling under it fades into the white area instead of being hidden
+ * behind a hard horizontal bar.
  */
 export function PagingFooter({ canUp, canDown, onUp, onDown }: Props) {
+  // When the list fits within the panel, both directions are disabled and
+  // there's nothing useful to do — hide the pager entirely so the screen
+  // doesn't gain a row of dead controls.
+  if (!canUp && !canDown) return null
   return (
     <div
-      className="shrink-0 flex items-stretch border-t border-btn-secondary-stroke bg-white -mx-[8px] -mb-[8px] px-[8px] pt-[16px] pb-[8px]"
-      style={{ boxShadow: '0 -4px 6px rgba(0,0,0,0.25)' }}
+      // -mt consumes the gap MenuModal puts between flex children so the
+      // pager sits flush against the scrollable area above it. Without
+      // this, the gap fills with the panel's bg-white and the drop-shadow
+      // has no content to project onto, making the shadow invisible.
+      className="shrink-0 flex items-stretch -mt-[10px] -mx-[8px] -mb-[8px] p-[8px] rounded-b-[12px] bg-white"
+      style={{
+        // Drop shadow projects upward so the pager appears to float above
+        // the scrolling content (per Figma node 1017:17964).
+        filter: 'drop-shadow(0 -4px 6px rgba(0,0,0,0.25))',
+      }}
     >
       <PagerButton direction="up" disabled={!canUp} onClick={onUp} />
       <PagerButton direction="down" disabled={!canDown} onClick={onDown} />

@@ -6,8 +6,8 @@ import {
   LevelerIcon,
   LockIcon,
 } from '../icons/EquipmentIcons'
-import { ChevronRightIcon } from '../icons/Icons'
 import { MenuModal } from './MenuModal'
+import { PagingFooter } from './PagingFooter'
 
 type Props = {
   doorNumber: string
@@ -31,8 +31,23 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
     setCanDown(el.scrollTop + el.clientHeight < el.scrollHeight - 1)
   }
 
-  // Recompute on mount, on content change, and on scroll.
+  // When the content size changes (showDetails toggling), the pager
+  // visibility has a feedback loop: the pager itself shrinks the scroll
+  // area, which can keep canDown=true even if the un-paged content would
+  // fit. To break the loop we pessimistically hide the pager and reset
+  // scroll position synchronously, then re-measure after React has
+  // rendered the larger (un-paged) scroll area.
   useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollTop = 0
+    setCanUp(false)
+    setCanDown(false)
+  }, [showDetails])
+
+  useEffect(() => {
+    // Runs after the layout-effect's re-render with both flags false. By
+    // now the scroll container is at its full (un-paged) height, so a
+    // recompute correctly decides whether the pager is actually needed.
     recompute()
   }, [showDetails])
 
@@ -48,7 +63,7 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
   }
 
   return (
-    <MenuModal title="Equipment Info" onBack={onBack} onClose={onClose} gap={0}>
+    <MenuModal title="Equipment Info" onBack={onBack} onClose={onClose}>
       <div
         ref={scrollRef}
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-[40px]"
@@ -56,7 +71,7 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
       >
           {/* Hide WebKit scrollbar */}
           <style>{`.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
-          <div className="no-scrollbar py-[24px]">
+          <div className="no-scrollbar pb-[24px]">
             <ControllerSection
               showDetails={showDetails}
               onToggle={() => setShowDetails((v) => !v)}
@@ -103,7 +118,7 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
           </div>
         </div>
 
-      <PagingButtons
+      <PagingFooter
         canUp={canUp}
         canDown={canDown}
         onUp={() => scrollBy(-PAGE_STEP)}
@@ -233,60 +248,3 @@ function ThinDivider() {
   return <div className="w-full border-t" style={{ borderColor: '#e5e5e5' }} />
 }
 
-function PagingButtons({
-  canUp,
-  canDown,
-  onUp,
-  onDown,
-}: {
-  canUp: boolean
-  canDown: boolean
-  onUp: () => void
-  onDown: () => void
-}) {
-  return (
-    <div
-      className="shrink-0 flex items-stretch border-t border-btn-secondary-stroke bg-white px-[8px] pt-[16px] pb-[8px]"
-      style={{ boxShadow: '0 -4px 6px rgba(0,0,0,0.25)' }}
-    >
-      <PagingButton direction="up" disabled={!canUp} onClick={onUp} />
-      <PagingButton direction="down" disabled={!canDown} onClick={onDown} />
-    </div>
-  )
-}
-
-function PagingButton({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: 'up' | 'down'
-  disabled: boolean
-  onClick: () => void
-}) {
-  const rounded = direction === 'up' ? 'rounded-l-[8px]' : 'rounded-r-[8px]'
-  const baseStyles = disabled
-    ? 'bg-white border-[#eaeaea] text-[#a6a6a6] cursor-not-allowed'
-    : 'bg-btn-secondary-bg border-btn-secondary-stroke text-btn-secondary-label cursor-pointer active:bg-[#ebebeb]'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={direction === 'up' ? 'Scroll up' : 'Scroll down'}
-      className={`flex-1 h-[62px] flex items-center justify-center border ${rounded} ${baseStyles}`}
-      style={{ boxShadow: '1px 1px 4px 0 rgba(0,0,0,0.15)' }}
-    >
-      <span
-        className="block"
-        style={{
-          width: 30,
-          height: 30,
-          transform: direction === 'up' ? 'rotate(-90deg)' : 'rotate(90deg)',
-        }}
-      >
-        <ChevronRightIcon className="h-full w-full" />
-      </span>
-    </button>
-  )
-}

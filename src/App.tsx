@@ -34,6 +34,15 @@ import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
 import { CardCredential } from './components/CardCredential'
 import {
+  BypassConfiguration,
+  type BypassConfig,
+} from './components/BypassConfiguration'
+import {
+  UserAccessConfiguration,
+  type UserAccessConfig,
+} from './components/UserAccessConfiguration'
+import { EditBypassCode } from './components/EditBypassCode'
+import {
   MaintenanceEntry,
   MaintenanceMenu,
   MaintenanceRecords,
@@ -58,6 +67,10 @@ type Menu =
   | 'settings'
   | 'idock-config'
   | 'card-credential'
+  | 'bypass-config'
+  | 'bypass-edit-pin'
+  | 'user-access-config'
+  | 'user-access-edit-pin'
   | 'cameras'
   | 'camera-settings'
   | 'camera-state'
@@ -97,6 +110,30 @@ export default function App() {
   ])
   const [myqSubscribed, setMyqSubscribed] = useState(true)
   const [cardCredentialEnabled, setCardCredentialEnabled] = useState(true)
+  const [bypassConfig, setBypassConfig] = useState<BypassConfig>({
+    enabled: true,
+    pinCode: true,
+    cardCredential: true,
+    remote: false,
+    pin: '12345678',
+  })
+  /**
+   * In-flight BypassConfiguration draft, captured when the user navigates to
+   * the Edit Bypass Code sub-screen so the rest of the form's unsaved edits
+   * survive the round-trip. Null whenever there's no pending edit.
+   */
+  const [pendingBypassDraft, setPendingBypassDraft] =
+    useState<BypassConfig | null>(null)
+  const [userAccessConfig, setUserAccessConfig] = useState<UserAccessConfig>({
+    enabled: true,
+    pinCode: true,
+    cardCredential: true,
+    remote: false,
+    pin: '12345678',
+  })
+  // Mirror of pendingBypassDraft, for the User Access Configuration flow.
+  const [pendingUserAccessDraft, setPendingUserAccessDraft] =
+    useState<UserAccessConfig | null>(null)
   const [trailerPresent, setTrailerPresentRaw] = useState(false)
   const [restraintOnline, setRestraintOnline] = useState(true)
   const [bypassStep, setBypassStep] = useState<'none' | 'wait' | 'pin'>('none')
@@ -799,6 +836,8 @@ export default function App() {
               onOpenCameras={() => setMenu('cameras')}
               onOpenDiagnostics={() => setMenu('diagnostics')}
               onOpenCardCredential={() => setMenu('card-credential')}
+              onOpenBypassConfig={() => setMenu('bypass-config')}
+              onOpenUserAccessConfig={() => setMenu('user-access-config')}
               cardCredentialEnabled={cardCredentialEnabled}
             />
           )}
@@ -810,6 +849,95 @@ export default function App() {
               onSave={(v) => {
                 setCardCredentialEnabled(v)
                 setMenu('idock-config')
+              }}
+            />
+          )}
+          {menu === 'bypass-config' && mode === 'unlocked' && (
+            <BypassConfiguration
+              // If the user came back from Edit Bypass Code, prefer the
+              // preserved draft so their other unsaved edits aren't lost.
+              value={pendingBypassDraft ?? bypassConfig}
+              cardCredentialEnabled={cardCredentialEnabled}
+              onBack={() => {
+                setPendingBypassDraft(null)
+                setMenu('idock-config')
+              }}
+              onClose={() => {
+                setPendingBypassDraft(null)
+                setMenu('none')
+              }}
+              onSave={(v) => {
+                setBypassConfig(v)
+                setPendingBypassDraft(null)
+                setMenu('idock-config')
+              }}
+              onEditPin={(currentDraft) => {
+                setPendingBypassDraft(currentDraft)
+                setMenu('bypass-edit-pin')
+              }}
+            />
+          )}
+          {menu === 'bypass-edit-pin' && mode === 'unlocked' && (
+            <EditBypassCode
+              pinIsSet={Boolean((pendingBypassDraft ?? bypassConfig).pin)}
+              onBack={() => setMenu('bypass-config')}
+              onClose={() => {
+                setPendingBypassDraft(null)
+                setMenu('none')
+              }}
+              onSave={(newPin) => {
+                // newPin may be null when the user pressed Go with no
+                // digits in the "new" phase — that unsets the PIN.
+                setPendingBypassDraft((d) =>
+                  d ? { ...d, pin: newPin } : { ...bypassConfig, pin: newPin },
+                )
+                setMenu('bypass-config')
+              }}
+            />
+          )}
+          {menu === 'user-access-config' && mode === 'unlocked' && (
+            <UserAccessConfiguration
+              value={pendingUserAccessDraft ?? userAccessConfig}
+              cardCredentialEnabled={cardCredentialEnabled}
+              onBack={() => {
+                setPendingUserAccessDraft(null)
+                setMenu('idock-config')
+              }}
+              onClose={() => {
+                setPendingUserAccessDraft(null)
+                setMenu('none')
+              }}
+              onSave={(v) => {
+                setUserAccessConfig(v)
+                setPendingUserAccessDraft(null)
+                setMenu('idock-config')
+              }}
+              onEditPin={(currentDraft) => {
+                setPendingUserAccessDraft(currentDraft)
+                setMenu('user-access-edit-pin')
+              }}
+            />
+          )}
+          {menu === 'user-access-edit-pin' && mode === 'unlocked' && (
+            <EditBypassCode
+              title="Edit Access Code"
+              verifyBody="Enter the access code"
+              newBody="Enter the NEW access code"
+              pinIsSet={Boolean(
+                (pendingUserAccessDraft ?? userAccessConfig).pin,
+              )}
+              onBack={() => setMenu('user-access-config')}
+              onClose={() => {
+                setPendingUserAccessDraft(null)
+                setMenu('none')
+              }}
+              onSave={(newPin) => {
+                setPendingUserAccessDraft((d) =>
+                  d
+                    ? { ...d, pin: newPin }
+                    : { ...userAccessConfig, pin: newPin },
+                )
+                setMenu('user-access-config')
               }}
             />
           )}

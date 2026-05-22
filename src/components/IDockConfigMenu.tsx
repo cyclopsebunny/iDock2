@@ -8,6 +8,8 @@ type Props = {
   onOpenCameras: () => void
   onOpenDiagnostics: () => void
   onOpenCardCredential: () => void
+  onOpenBypassConfig: () => void
+  onOpenUserAccessConfig: () => void
   cardCredentialEnabled: boolean
 }
 
@@ -17,6 +19,8 @@ export function IDockConfigMenu({
   onOpenCameras,
   onOpenDiagnostics,
   onOpenCardCredential,
+  onOpenBypassConfig,
+  onOpenUserAccessConfig,
   cardCredentialEnabled,
 }: Props) {
   const t = useT()
@@ -32,8 +36,11 @@ export function IDockConfigMenu({
         status={cardCredentialEnabled ? t('Enabled') : t('Disabled')}
         onClick={onOpenCardCredential}
       />
-      <MenuRow label={t('Bypass Configuration')} />
-      <MenuRow label={t('User Access Configuration')} />
+      <MenuRow label={t('Bypass Configuration')} onClick={onOpenBypassConfig} />
+      <MenuRow
+        label={t('User Access Configuration')}
+        onClick={onOpenUserAccessConfig}
+      />
     </MenuModal>
   )
 }

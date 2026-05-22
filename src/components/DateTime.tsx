@@ -4,6 +4,7 @@ import { CalendarIcon, ClockIcon } from '../icons/EquipmentIcons'
 import { ChevronRightIcon } from '../icons/Icons'
 import { MenuModal } from './MenuModal'
 import { MenuRow } from './MenuRow'
+import { PagingFooter } from './PagingFooter'
 import { SaveButton } from './SaveButton'
 
 type CommonProps = { onBack: () => void; onClose: () => void }
@@ -351,7 +352,7 @@ export function TimeZoneScreen({
         })}
       </div>
       <SaveButton enabled={dirty} onClick={() => onSave(draft)} />
-      <PagingButtons
+      <PagingFooter
         canUp={canUp}
         canDown={canDown}
         onUp={() => scrollRef.current?.scrollBy({ top: -200, behavior: 'smooth' })}
@@ -361,58 +362,3 @@ export function TimeZoneScreen({
   )
 }
 
-function PagingButtons({
-  canUp,
-  canDown,
-  onUp,
-  onDown,
-}: {
-  canUp: boolean
-  canDown: boolean
-  onUp: () => void
-  onDown: () => void
-}) {
-  return (
-    <div
-      className="shrink-0 flex items-stretch bg-white"
-      style={{ boxShadow: '0 -2px 4px rgba(0,0,0,0.1)' }}
-    >
-      <PagingBtn direction="up" disabled={!canUp} onClick={onUp} />
-      <PagingBtn direction="down" disabled={!canDown} onClick={onDown} />
-    </div>
-  )
-}
-
-function PagingBtn({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: 'up' | 'down'
-  disabled: boolean
-  onClick: () => void
-}) {
-  const styles = disabled
-    ? 'text-[#a6a6a6] cursor-not-allowed'
-    : 'text-btn-secondary-label cursor-pointer active:bg-[#ebebeb]'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={direction === 'up' ? 'Scroll up' : 'Scroll down'}
-      className={`flex-1 h-[44px] flex items-center justify-center bg-white border border-btn-secondary-stroke ${styles}`}
-    >
-      <span
-        className="block"
-        style={{
-          width: 22,
-          height: 22,
-          transform: direction === 'up' ? 'rotate(-90deg)' : 'rotate(90deg)',
-        }}
-      >
-        <ChevronRightIcon className="h-full w-full" />
-      </span>
-    </button>
-  )
-}
