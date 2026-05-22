@@ -32,6 +32,7 @@ import { Counters } from './components/Counters'
 import { Diagnostics } from './components/Diagnostics'
 import { EquipmentInfo } from './components/EquipmentInfo'
 import { IDockConfigMenu } from './components/IDockConfigMenu'
+import { CardCredential } from './components/CardCredential'
 import {
   MaintenanceEntry,
   MaintenanceMenu,
@@ -56,6 +57,7 @@ type Menu =
   | 'main'
   | 'settings'
   | 'idock-config'
+  | 'card-credential'
   | 'cameras'
   | 'camera-settings'
   | 'camera-state'
@@ -94,6 +96,7 @@ export default function App() {
     defaultMotionConfig(),
   ])
   const [myqSubscribed, setMyqSubscribed] = useState(true)
+  const [cardCredentialEnabled, setCardCredentialEnabled] = useState(true)
   const [trailerPresent, setTrailerPresentRaw] = useState(false)
   const [restraintOnline, setRestraintOnline] = useState(true)
   const [bypassStep, setBypassStep] = useState<'none' | 'wait' | 'pin'>('none')
@@ -289,7 +292,11 @@ export default function App() {
           }
         >
           {mode === 'locked' && (
-            <LockedScreen doorNumber={doorNumber} onTapToUnlock={() => setMode('pin')} />
+            <LockedScreen
+              doorNumber={doorNumber}
+              onTapToUnlock={() => setMode('pin')}
+              showScanBadgePrompt={cardCredentialEnabled}
+            />
           )}
           {mode === 'pin' && (
             <PinScreen
@@ -791,6 +798,19 @@ export default function App() {
               onClose={() => setMenu('none')}
               onOpenCameras={() => setMenu('cameras')}
               onOpenDiagnostics={() => setMenu('diagnostics')}
+              onOpenCardCredential={() => setMenu('card-credential')}
+              cardCredentialEnabled={cardCredentialEnabled}
+            />
+          )}
+          {menu === 'card-credential' && mode === 'unlocked' && (
+            <CardCredential
+              enabled={cardCredentialEnabled}
+              onBack={() => setMenu('idock-config')}
+              onClose={() => setMenu('none')}
+              onSave={(v) => {
+                setCardCredentialEnabled(v)
+                setMenu('idock-config')
+              }}
             />
           )}
           {menu === 'diagnostics' && mode === 'unlocked' && (

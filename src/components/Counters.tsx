@@ -7,7 +7,8 @@ import {
   LockXIcon,
   TrailerIcon,
 } from '../icons/EquipmentIcons'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
 
 type Props = {
   onBack: () => void
@@ -19,42 +20,8 @@ const ALERT_RED = '#9E2D08'
 export function Counters({ onBack, onClose }: Props) {
   const t = useT()
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
-      />
-      <div
-        className="relative flex flex-col gap-[8px] bg-white rounded-[12px] shadow-panel"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
-      >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back to Main Menu"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {t('Counters')}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-[12px] w-full">
+    <MenuModal title="Counters" onBack={onBack} onClose={onClose} gap={8}>
+      <div className="flex flex-col gap-[12px] w-full">
           <div className="flex gap-[12px] w-full">
             <StatCard
               icon={<LockIcon className="h-full w-full" />}
@@ -100,11 +67,10 @@ export function Counters({ onBack, onClose }: Props) {
           </div>
         </div>
 
-        <NavRow label={t('Recordings')} value="500" />
-        <NavRow label={t('Fault Counters')} value="324" />
-        <NavRow label={t('Door Code Counters')} value="12" />
-      </div>
-    </div>
+      <NavRow label={t('Recordings')} value="500" />
+      <NavRow label={t('Fault Counters')} value="324" />
+      <NavRow label={t('Door Code Counters')} value="12" />
+    </MenuModal>
   )
 }
 

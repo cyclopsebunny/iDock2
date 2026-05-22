@@ -1,5 +1,6 @@
 import { useT } from '../i18n/LanguageContext'
-import { BackArrowIcon, CameraIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { CameraIcon, ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
 
 type Props = {
   cameraIndex: number
@@ -27,61 +28,31 @@ export function CameraSettings({
   const t = useT()
   const motionDisabled = !cameraConnected || !myqSubscribed
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
+    <MenuModal
+      title={t('Camera {n} Settings', { n: cameraIndex })}
+      onBack={onBack}
+      onClose={onClose}
+    >
+      {!cameraConnected && <DisconnectedAlert />}
+      {cameraConnected && !myqSubscribed && <MyqRequiredAlert />}
+      <StateRow
+        icon={<CameraIcon className="h-full w-full" />}
+        label={t('Camera State')}
+        status={
+          cameraConnected ? (cameraEnabled ? t('Enabled') : t('Disabled')) : undefined
+        }
+        onClick={cameraConnected ? onOpenCameraState : undefined}
+        disabled={!cameraConnected}
       />
-      <div
-        className="relative flex flex-col gap-[10px] bg-white rounded-[12px] shadow-panel"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
-      >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back to Cameras"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {t('Camera {n} Settings', { n: cameraIndex })}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-        {!cameraConnected && <DisconnectedAlert />}
-        {cameraConnected && !myqSubscribed && <MyqRequiredAlert />}
-        <StateRow
-          icon={<CameraIcon className="h-full w-full" />}
-          label={t('Camera State')}
-          status={
-            cameraConnected ? (cameraEnabled ? t('Enabled') : t('Disabled')) : undefined
-          }
-          onClick={cameraConnected ? onOpenCameraState : undefined}
-          disabled={!cameraConnected}
-        />
-        <StateRow
-          label={t('Motion Detection Configuration')}
-          status={
-            !motionDisabled ? (motionDetectionOn ? t('On') : t('Off')) : undefined
-          }
-          onClick={!motionDisabled ? onOpenMotionDetection : undefined}
-          disabled={motionDisabled}
-        />
-      </div>
-    </div>
+      <StateRow
+        label={t('Motion Detection Configuration')}
+        status={
+          !motionDisabled ? (motionDetectionOn ? t('On') : t('Off')) : undefined
+        }
+        onClick={!motionDisabled ? onOpenMotionDetection : undefined}
+        disabled={motionDisabled}
+      />
+    </MenuModal>
   )
 }
 

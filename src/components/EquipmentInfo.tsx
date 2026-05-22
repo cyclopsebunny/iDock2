@@ -6,7 +6,8 @@ import {
   LevelerIcon,
   LockIcon,
 } from '../icons/EquipmentIcons'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
 
 type Props = {
   doorNumber: string
@@ -47,46 +48,12 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
   }
 
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
-      />
+    <MenuModal title="Equipment Info" onBack={onBack} onClose={onClose} gap={0}>
       <div
-        className="relative flex flex-col bg-white rounded-[12px] shadow-panel overflow-hidden"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-[40px]"
+        style={{ scrollbarWidth: 'none' }}
       >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back to Main Menu"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {t('Equipment Info')}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-
-        <div
-          ref={scrollRef}
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-[40px]"
-          style={{ scrollbarWidth: 'none' }}
-        >
           {/* Hide WebKit scrollbar */}
           <style>{`.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
           <div className="no-scrollbar py-[24px]">
@@ -136,14 +103,13 @@ export function EquipmentInfo({ doorNumber, onBack, onClose }: Props) {
           </div>
         </div>
 
-        <PagingButtons
-          canUp={canUp}
-          canDown={canDown}
-          onUp={() => scrollBy(-PAGE_STEP)}
-          onDown={() => scrollBy(PAGE_STEP)}
-        />
-      </div>
-    </div>
+      <PagingButtons
+        canUp={canUp}
+        canDown={canDown}
+        onUp={() => scrollBy(-PAGE_STEP)}
+        onDown={() => scrollBy(PAGE_STEP)}
+      />
+    </MenuModal>
   )
 }
 

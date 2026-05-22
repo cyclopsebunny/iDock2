@@ -6,9 +6,15 @@ import { KeypadIcon } from '../icons/Icons'
 type Props = {
   doorNumber: string
   onTapToUnlock: () => void
+  /** When true, prompt the user to scan their badge. False hides the text. */
+  showScanBadgePrompt?: boolean
 }
 
-export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
+export function LockedScreen({
+  doorNumber,
+  onTapToUnlock,
+  showScanBadgePrompt = true,
+}: Props) {
   const t = useT()
   return (
     <button
@@ -41,9 +47,15 @@ export function LockedScreen({ doorNumber, onTapToUnlock }: Props) {
               {doorNumber}
             </div>
           </div>
-          <div className="w-full text-center font-inter font-medium text-primary-text text-[32px]">
-            {t('Scan Badge to Unlock')}
-          </div>
+          {showScanBadgePrompt ? (
+            <div className="w-full text-center font-inter font-medium text-primary-text text-[32px]">
+              {t('Scan Badge to Unlock')}
+            </div>
+          ) : (
+            // Reserve the same vertical space so the layout doesn't shift
+            // when the prompt is hidden.
+            <div style={{ height: 40 }} />
+          )}
         </div>
       </Panel>
     </button>

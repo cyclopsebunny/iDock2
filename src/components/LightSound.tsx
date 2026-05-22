@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
 import { ClockIcon, LightBulbIcon, VolumeIcon } from '../icons/EquipmentIcons'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
+import { SaveButton } from './SaveButton'
 
 type Props = {
   onBack: () => void
@@ -36,85 +38,49 @@ export function LightSound({ onBack, onClose }: Props) {
     setDraft((d) => ({ ...d, [key]: value }))
 
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
+    <MenuModal title="Light & Sound" onBack={onBack} onClose={onClose}>
+      <ToggleRow
+        icon={<ClockIcon className="h-full w-full text-btn-secondary-label" />}
+        label={t('Color Mode')}
+        value={draft.colorMode}
+        onChange={(v) => update('colorMode', v)}
       />
-      <div
-        className="relative flex flex-col gap-[10px] bg-white rounded-[12px] shadow-panel"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
-      >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {t('Light & Sound')}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
 
-        <ToggleRow
-          icon={<ClockIcon className="h-full w-full text-btn-secondary-label" />}
-          label={t('Color Mode')}
-          value={draft.colorMode}
-          onChange={(v) => update('colorMode', v)}
-        />
+      <SliderPanel
+        icon={<LightBulbIcon className="text-btn-secondary-label" />}
+        label={t('Light Bar')}
+        on={draft.lightBar}
+        onChangeOn={(v) => update('lightBar', v)}
+        level={draft.lightBarLevel}
+        onChangeLevel={(v) => update('lightBarLevel', v)}
+      />
 
-        <SliderPanel
-          icon={<LightBulbIcon className="text-btn-secondary-label" />}
-          label={t('Light Bar')}
-          on={draft.lightBar}
-          onChangeOn={(v) => update('lightBar', v)}
-          level={draft.lightBarLevel}
-          onChangeLevel={(v) => update('lightBarLevel', v)}
-        />
+      <SliderPanel
+        icon={<LightBulbIcon className="text-btn-secondary-label" />}
+        label={t('Outside Light')}
+        on={draft.outsideLight}
+        onChangeOn={(v) => update('outsideLight', v)}
+        level={draft.outsideLightLevel}
+        onChangeLevel={(v) => update('outsideLightLevel', v)}
+      />
 
-        <SliderPanel
-          icon={<LightBulbIcon className="text-btn-secondary-label" />}
-          label={t('Outside Light')}
-          on={draft.outsideLight}
-          onChangeOn={(v) => update('outsideLight', v)}
-          level={draft.outsideLightLevel}
-          onChangeLevel={(v) => update('outsideLightLevel', v)}
-        />
+      <ToggleRow
+        icon={<VolumeIcon className="h-full w-full text-btn-secondary-label" />}
+        label={t('Sound')}
+        value={draft.sound}
+        onChange={(v) => update('sound', v)}
+      />
 
-        <ToggleRow
-          icon={<VolumeIcon className="h-full w-full text-btn-secondary-label" />}
-          label={t('Sound')}
-          value={draft.sound}
-          onChange={(v) => update('sound', v)}
-        />
+      <div className="flex-1" />
 
-        <div className="flex-1" />
-
-        <SaveButton
-          enabled={dirty}
-          onClick={() => {
-            setCommitted(draft)
-            onBack()
-          }}
-          label={t('Save Settings')}
-        />
-      </div>
-    </div>
+      <SaveButton
+        enabled={dirty}
+        onClick={() => {
+          setCommitted(draft)
+          onBack()
+        }}
+      />
+    </MenuModal>
   )
 }
 
@@ -265,33 +231,3 @@ function BrightnessSlider({
   )
 }
 
-function SaveButton({
-  enabled,
-  onClick,
-  label,
-}: {
-  enabled: boolean
-  onClick: () => void
-  label: string
-}) {
-  if (enabled) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full h-[75px] px-[12px] rounded-[8px] border border-accent-blue bg-accent-blue text-white font-inter font-medium text-center text-[32px] tracking-[0.0066em] transition-opacity active:opacity-90"
-      >
-        {label}
-      </button>
-    )
-  }
-  return (
-    <button
-      type="button"
-      disabled
-      className="w-full h-[75px] px-[12px] rounded-[8px] border border-[#eaeaea] bg-white text-[#a6a6a6] font-inter font-medium text-center text-[32px] tracking-[0.0066em] cursor-not-allowed"
-    >
-      {label}
-    </button>
-  )
-}

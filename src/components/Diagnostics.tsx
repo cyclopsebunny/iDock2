@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
 import { MenuRow } from './MenuRow'
 import { PagingFooter } from './PagingFooter'
 
@@ -39,75 +40,40 @@ export function Diagnostics({ onBack, onClose }: Props) {
   }, [])
 
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
-      />
+    <MenuModal title="Diagnostics" onBack={onBack} onClose={onClose}>
       <div
-        className="relative flex flex-col gap-[10px] bg-white rounded-[12px] shadow-panel overflow-hidden"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar flex flex-col gap-[10px]"
+        style={{ scrollbarWidth: 'none' }}
       >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {t('Diagnostics')}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-
-        <div
-          ref={scrollRef}
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar flex flex-col gap-[10px]"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          <style>{`.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
-          <MenuRow label={t('Controller Info')} />
-          <NavRowMultiline
-            label={t('Date & Time')}
-            statusLines={['8/6/24', '12:00']}
-          />
-          <MenuRow label={t('Next Preventative Maintenance')} status="10/1/24" />
-          <MenuRow label={t('Max Days to PM')} status="90" />
-          <MenuRow label={t('Controller I/O')} />
-          {IO_ROWS.map((row, i) => (
-            <IoStateRow
-              key={i}
-              letter={row.letter}
-              label={t(row.label)}
-              enabled={row.enabled}
-              enabledLabel={t('Enabled')}
-              disabledLabel={t('Disabled')}
-            />
-          ))}
-        </div>
-
-        <PagingFooter
-          canUp={canUp}
-          canDown={canDown}
-          onUp={() => scrollRef.current?.scrollBy({ top: -220, behavior: 'smooth' })}
-          onDown={() => scrollRef.current?.scrollBy({ top: 220, behavior: 'smooth' })}
+        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
+        <MenuRow label={t('Controller Info')} />
+        <NavRowMultiline
+          label={t('Date & Time')}
+          statusLines={['8/6/24', '12:00']}
         />
+        <MenuRow label={t('Next Preventative Maintenance')} status="10/1/24" />
+        <MenuRow label={t('Max Days to PM')} status="90" />
+        <MenuRow label={t('Controller I/O')} />
+        {IO_ROWS.map((row, i) => (
+          <IoStateRow
+            key={i}
+            letter={row.letter}
+            label={t(row.label)}
+            enabled={row.enabled}
+            enabledLabel={t('Enabled')}
+            disabledLabel={t('Disabled')}
+          />
+        ))}
       </div>
-    </div>
+
+      <PagingFooter
+        canUp={canUp}
+        canDown={canDown}
+        onUp={() => scrollRef.current?.scrollBy({ top: -220, behavior: 'smooth' })}
+        onDown={() => scrollRef.current?.scrollBy({ top: 220, behavior: 'smooth' })}
+      />
+    </MenuModal>
   )
 }
 

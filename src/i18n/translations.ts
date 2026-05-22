@@ -74,7 +74,7 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Maxum Settings': 'Ajustes Maxum',
     'Field Installation Settings': 'Ajustes de instalación en campo',
     'Factory Installation Settings': 'Ajustes de fábrica',
-    Reader: 'Lector',
+    'Card/Credential': 'Tarjeta/Credencial',
     'Bypass Configuration': 'Configuración de anulación',
     'User Access Configuration': 'Configuración de acceso',
 
@@ -260,7 +260,7 @@ export const dictionary: Record<Lang, Record<string, string>> = {
     'Maxum Settings': 'Paramètres Maxum',
     'Field Installation Settings': 'Paramètres terrain',
     'Factory Installation Settings': "Paramètres d'usine",
-    Reader: 'Lecteur',
+    'Card/Credential': 'Carte / Identifiant',
     'Bypass Configuration': 'Configuration du contournement',
     'User Access Configuration': "Configuration de l'accès utilisateur",
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
-import { BackArrowIcon, CloseIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
+import { SaveButton } from './SaveButton'
 
 export type Point = { x: number; y: number }
 
@@ -99,90 +100,51 @@ export function MotionDetectionConfig({
   }
 
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
-      />
-      <div
-        className="relative flex flex-col gap-[12px] bg-white rounded-[12px] shadow-panel"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16 }}
-      >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back to Camera Settings"
-            onClick={onBack}
-            disabled={!cameraConnected}
-            className={`shrink-0 ${cameraConnected ? 'text-brand-primary' : 'text-[#a6a6a6] cursor-not-allowed'}`}
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {(() => {
-              const parts = t('Motion Detection\nConfiguration').split('\n')
-              return (
-                <>
-                  {parts[0]}
-                  {parts[1] && (<><br />{parts[1]}</>)}
-                </>
-              )
-            })()}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-
-        <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
-          <MotionToggleRow cameraIndex={cameraIndex} on={on} onChange={setOn} />
-        </div>
-
-        {cameraConnected ? (
-          <PhotoArea
-            phase={phase}
-            countdown={countdown}
-            corners={corners}
-            setCorners={setCorners}
-          />
-        ) : (
-          <DisconnectedPanel />
-        )}
-
-        <div className="flex gap-[10px]">
-          <ActionButton
-            primary
-            disabled={!cameraConnected || phase === 'countdown'}
-            onClick={() => setPhase('countdown')}
-          >
-            {t('Take Picture')}
-          </ActionButton>
-          <ActionButton
-            disabled={!cameraConnected || phase !== 'taken'}
-            onClick={() => setCorners(defaultCorners())}
-          >
-            {t('Back to Default')}
-          </ActionButton>
-        </div>
-
-        <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
-          <SensitivityPanel value={sensitivity} onChange={setSensitivity} />
-        </div>
-
-        <div className="flex-1" />
-
-        <SaveButton enabled={cameraConnected && dirty} onClick={save} />
+    <MenuModal
+      title="Motion Detection Configuration"
+      onBack={onBack}
+      onClose={onClose}
+      gap={12}
+    >
+      <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
+        <MotionToggleRow cameraIndex={cameraIndex} on={on} onChange={setOn} />
       </div>
-    </div>
+
+      {cameraConnected ? (
+        <PhotoArea
+          phase={phase}
+          countdown={countdown}
+          corners={corners}
+          setCorners={setCorners}
+        />
+      ) : (
+        <DisconnectedPanel />
+      )}
+
+      <div className="flex gap-[10px]">
+        <ActionButton
+          primary
+          disabled={!cameraConnected || phase === 'countdown'}
+          onClick={() => setPhase('countdown')}
+        >
+          {t('Take Picture')}
+        </ActionButton>
+        <ActionButton
+          disabled={!cameraConnected || phase !== 'taken'}
+          onClick={() => setCorners(defaultCorners())}
+        >
+          {t('Back to Default')}
+        </ActionButton>
+      </div>
+
+      <div className={cameraConnected ? '' : 'opacity-50 pointer-events-none'}>
+        <SensitivityPanel value={sensitivity} onChange={setSensitivity} />
+      </div>
+
+      <div className="flex-1" />
+
+      <SaveButton enabled={cameraConnected && dirty} onClick={save} label="Save Configuration" />
+    </MenuModal>
   )
 }
 
@@ -511,26 +473,3 @@ function ChevronRight() {
   )
 }
 
-function SaveButton({ enabled, onClick }: { enabled: boolean; onClick: () => void }) {
-  const t = useT()
-  if (enabled) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full px-[12px] py-[14px] rounded-[6px] border border-brand-primary bg-brand-primary text-white font-inter font-medium text-center text-[24px] tracking-[0.0066em] transition-opacity active:opacity-90"
-      >
-        {t('Save Configuration')}
-      </button>
-    )
-  }
-  return (
-    <button
-      type="button"
-      disabled
-      className="w-full px-[12px] py-[14px] rounded-[6px] border border-[#eaeaea] bg-btn-secondary-bg text-[#a6a6a6] font-inter font-medium text-center text-[24px] tracking-[0.0066em] cursor-not-allowed"
-    >
-      {t('Save Configuration')}
-    </button>
-  )
-}

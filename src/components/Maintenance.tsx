@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n/LanguageContext'
 import { CalendarIcon } from '../icons/EquipmentIcons'
-import { BackArrowIcon, ChevronRightIcon, CloseIcon } from '../icons/Icons'
+import { ChevronRightIcon } from '../icons/Icons'
+import { MenuModal } from './MenuModal'
 import { MenuRow } from './MenuRow'
 
 type CommonProps = {
@@ -27,43 +28,9 @@ export function MaintenancePanel({
   gap?: number
 }) {
   return (
-    <div className="absolute inset-0 flex items-end" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0"
-      />
-      <div
-        className="relative flex flex-col bg-white rounded-[12px] shadow-panel"
-        style={{ width: 448, height: 768, padding: 8, marginLeft: 16, marginBottom: 16, gap }}
-      >
-        <div className="flex h-[66px] items-center gap-[12px] px-[16px] shrink-0">
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={onBack}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <BackArrowIcon className="h-full w-full" />
-          </button>
-          <h2 className="flex-1 text-center font-inter font-semibold text-brand-primary text-[28px] leading-[30px]">
-            {title}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="shrink-0 text-brand-primary"
-            style={{ width: 36, height: 36 }}
-          >
-            <CloseIcon className="h-full w-full" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <MenuModal title={title} onBack={onBack} onClose={onClose} gap={gap}>
+      {children}
+    </MenuModal>
   )
 }
 
